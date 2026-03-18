@@ -4,6 +4,8 @@ import GlobalNav from './components/GlobalNav.vue'
 import GlobalFooter from './components/GlobalFooter.vue'
 import RichTextRenderer from './components/RichTextRenderer.vue'
 import DraftToggle from './components/DraftToggle.vue'
+import FormRenderer from './components/FormRenderer.vue'
+import PageBanner from './components/PageBanner.vue'
 
 const page = ref<any>(null)
 const error = ref<string | null>(null)
@@ -81,11 +83,13 @@ onMounted(async () => {
     </div>
 
     <div v-else-if="page" class="page-container">
+      <PageBanner v-if="page.banner" :image="page.banner.image" :text="page.banner.text" />
       <h1 class="page-title">{{ page.title }}</h1>
       <div class="page-body">
         <RichTextRenderer v-if="page.content?.root" :content="page.content.root" />
         <p v-else>No content yet</p>
       </div>
+      <FormRenderer v-if="page.form" :form-id="typeof page.form === 'object' ? page.form.id : page.form" />
     </div>
 
     <div v-else class="not-found-state">

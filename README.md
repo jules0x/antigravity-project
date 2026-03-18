@@ -56,6 +56,12 @@ Admins can append `?preview=true` to any frontend URL to view unpublished draft 
 ### Modular SCSS Architecture
 Frontend styles are split into `base/`, `layout/`, and `components/` partials, all imported through a single `main.scss` entry point, making the stylesheet easy to extend without conflicts.
 
+### Form Builder
+Uses `@payloadcms/plugin-form-builder` to let editors create forms (text, email, textarea, select, etc.) entirely within the CMS admin. Attach a form to any page via the **Embedded Form** field and it renders automatically in the frontend via `FormRenderer.vue`, which handles field rendering, validation, and submission back to the `form-submissions` collection.
+
+### Page Banner
+Editors can add a hero banner to any page via the **Banner** group in the CMS. This includes an image upload field (linked to the `media` collection) and an optional overlay text field. The `PageBanner.vue` component handles the responsive rendering of the image with a subtle gradient overlay for text readability.
+
 ---
 
 ## Getting Started

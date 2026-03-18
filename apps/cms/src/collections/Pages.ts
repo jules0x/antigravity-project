@@ -75,5 +75,39 @@ export const Pages: CollectionConfig = {
       name: 'content',
       type: 'richText',
     },
+    {
+      name: 'banner',
+      type: 'group',
+      label: 'Banner',
+      admin: {
+        description: 'Optional hero banner displayed at the top of the page.',
+      },
+      fields: [
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Banner Image',
+        },
+        {
+          name: 'text',
+          type: 'text',
+          label: 'Banner Text',
+          admin: {
+            description: 'Overlay text displayed on the banner image.',
+          },
+        },
+      ],
+    },
+    {
+      name: 'form',
+      type: 'relationship',
+      relationTo: 'forms',
+      label: 'Embedded Form',
+      admin: {
+        description: 'Optionally attach a form to this page (created via the Forms collection).',
+      },
+    },
   ],
 }
+

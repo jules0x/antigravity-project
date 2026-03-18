@@ -12,6 +12,7 @@ import { Items } from './collections/Items'
 import { Footer } from './globals/Footer'
 import { searchPlugin } from '@payloadcms/plugin-search'
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
+import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -54,6 +55,21 @@ export default buildConfig({
       collections: ['pages'],
       generateLabel: (_, doc) => doc.title as string,
       generateURL: (docs) => docs.reduce((url, doc) => `${url}/${doc.slug}`, ''),
+    }),
+    formBuilderPlugin({
+      fields: {
+        payment: false, // disable payment field (no payment processor configured)
+      },
+      formOverrides: {
+        admin: {
+          group: 'Content',
+        },
+      },
+      formSubmissionOverrides: {
+        admin: {
+          group: 'Content',
+        },
+      },
     }),
   ],
 })
