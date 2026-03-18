@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import HelloWorld from './components/HelloWorld.vue'
 
 const payloadUsers = ref<any>(null)
 const error = ref<string | null>(null)
@@ -22,17 +23,39 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div style="font-family: sans-serif; max-width: 600px; margin: 40px auto; text-align: center;">
-    <h1>Vite 8 + Vue + Payload CMS</h1>
-    <p>This is a starter boilerplate demonstrating the workspace setup.</p>
-    
-    <div style="margin-top: 40px; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
-      <h2>Payload API Data (Proxy Test)</h2>
-      <p v-if="error" style="color: red;">Error: {{ error }}</p>
-      <pre v-else-if="payloadUsers" style="text-align: left; background: #eee; padding: 10px; border-radius: 4px; overflow: auto; max-height: 300px;">
-        {{ JSON.stringify(payloadUsers, null, 2) }}
-      </pre>
-      <p v-else>Loading payload data...</p>
-    </div>
+  <HelloWorld />
+
+  <div class="api-test-container">
+    <h2>Payload API Data (Proxy Test)</h2>
+    <p v-if="error" class="error-text">Error: {{ error }}</p>
+    <pre v-else-if="payloadUsers" class="api-output">
+      {{ JSON.stringify(payloadUsers, null, 2) }}
+    </pre>
+    <p v-else>Loading payload data...</p>
   </div>
 </template>
+
+<style scoped lang="scss">
+.api-test-container {
+  margin: 40px auto;
+  padding: 20px;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 8px;
+  max-width: 600px;
+  text-align: center;
+}
+
+.error-text {
+  color: #ff4d4d;
+}
+
+.api-output {
+  text-align: left;
+  background: var(--bg-secondary, #eee);
+  padding: 10px;
+  border-radius: 4px;
+  overflow: auto;
+  max-height: 300px;
+  font-family: monospace;
+}
+</style>
