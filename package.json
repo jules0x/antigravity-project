@@ -1,0 +1,16 @@
+{
+  "name": "antigravity-project",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npx concurrently \"yarn workspace apps-cms dev\" \"yarn workspace frontend dev\"",
+    "build": "yarn workspace frontend build && yarn workspace apps-cms build",
+    "preview": "npx concurrently \"yarn workspace apps-cms start\" \"yarn workspace frontend preview\"",
+    "lint": "oxlint"
+  },
+  "devDependencies": {
+    "oxlint": "latest"
+  }
+}

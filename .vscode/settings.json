@@ -1,0 +1,7 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.stylelint": "explicit"
+  },
+  "stylelint.validate": ["css", "scss"],
+  "stylelint.nodePath": "/Users/julian.thomson/.local/share/fnm/node-versions/v20.20.1/installation/bin/node"
+}

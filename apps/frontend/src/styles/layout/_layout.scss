@@ -1,0 +1,142 @@
+#app {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 1126px;
+  max-width: 100%;
+  min-height: 100svh;
+  margin: 0 auto;
+  text-align: center;
+  border-inline: 1px solid var(--border);
+}
+
+#center {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  gap: 25px;
+  place-content: center;
+  place-items: center;
+
+  @media (width <= 1024px) {
+    gap: 18px;
+    padding: 32px 20px 24px;
+  }
+}
+
+#next-steps {
+  display: flex;
+  text-align: left;
+  border-top: 1px solid var(--border);
+
+  & > div {
+    flex: 1 1 0;
+    padding: 32px;
+
+    @media (width <= 1024px) {
+      padding: 24px 20px;
+    }
+  }
+
+  .icon {
+    width: 22px;
+    height: 22px;
+    margin-bottom: 16px;
+  }
+
+  @media (width <= 1024px) {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+#docs {
+  border-right: 1px solid var(--border);
+
+  @media (width <= 1024px) {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+#next-steps ul {
+  display: flex;
+  gap: 8px;
+  padding: 0;
+  margin: 32px 0 0;
+  list-style: none;
+
+  .logo {
+    height: 18px;
+  }
+
+  a {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 12px;
+    font-size: 16px;
+    color: var(--text-h);
+    text-decoration: none;
+    background: var(--social-bg);
+    border-radius: 6px;
+    transition: box-shadow 0.3s;
+
+    &:hover {
+      box-shadow: var(--shadow);
+    }
+
+    .button-icon {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  @media (width <= 1024px) {
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+
+    li {
+      flex: 1 1 calc(50% - 8px);
+    }
+
+    a {
+      box-sizing: border-box;
+      justify-content: center;
+      width: 100%;
+    }
+  }
+}
+
+#spacer {
+  height: 88px;
+  border-top: 1px solid var(--border);
+
+  @media (width <= 1024px) {
+    height: 48px;
+  }
+}
+
+.ticks {
+  position: relative;
+  width: 100%;
+
+  &::before,
+  &::after {
+    position: absolute;
+    top: -4.5px;
+    content: '';
+    border: 5px solid transparent;
+  }
+
+  &::before {
+    left: 0;
+    border-left-color: var(--border);
+  }
+
+  &::after {
+    right: 0;
+    border-right-color: var(--border);
+  }
+}

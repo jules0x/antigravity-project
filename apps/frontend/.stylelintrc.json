@@ -1,0 +1,18 @@
+{
+  "plugins": [
+    "stylelint-order"
+  ],
+  "extends": [
+    "stylelint-config-standard-scss",
+    "stylelint-config-recess-order"
+  ],
+  "rules": {
+    "scss/operator-no-unspaced": null,
+    "scss/at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": ["use", "forward", "if", "else", "each", "include", "mixin", "function", "return"]
+      }
+    ]
+  }
+}
