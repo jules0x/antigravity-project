@@ -1969,6 +1969,19 @@
     sass "1.77.4"
     uuid "10.0.0"
 
+"@payloadcms/plugin-nested-docs@^3.79.1":
+  version "3.79.1"
+  resolved "https://registry.yarnpkg.com/@payloadcms/plugin-nested-docs/-/plugin-nested-docs-3.79.1.tgz#90b8e35109a87bc3d3b5e2a51ce95ba67513c1fa"
+  integrity sha512-Tu211v0vz+zZl5o0iG6pFOiZcAs+BF68miCoCT/R5fvjGEuqOqB2j7psBwf4XOgm2swO/OLHZygQaCuGw/l3cg==
+
+"@payloadcms/plugin-search@3.79.1":
+  version "3.79.1"
+  resolved "https://registry.yarnpkg.com/@payloadcms/plugin-search/-/plugin-search-3.79.1.tgz#857ab16473365790b2df505633051f8d8340c256"
+  integrity sha512-BXNBXTZFyvyZP4szbqgw+ejzrHqmP4bvjI6pp4QpU9ZibTkkpDHmlPBXMJQWcYx2aKd39tbiKLJHtRY0eWNtYg==
+  dependencies:
+    "@payloadcms/next" "3.79.1"
+    "@payloadcms/ui" "3.79.1"
+
 "@payloadcms/richtext-lexical@3.79.1":
   version "3.79.1"
   resolved "https://registry.yarnpkg.com/@payloadcms/richtext-lexical/-/richtext-lexical-3.79.1.tgz#09627e1633b4ba04e760bea534ad27058a13c9f6"

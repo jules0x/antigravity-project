@@ -1,38 +1,101 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import HelloWorld from './components/HelloWorld.vue'
+import GlobalNav from './components/GlobalNav.vue'
+import GlobalFooter from './components/GlobalFooter.vue'
+import RichTextRenderer from './components/RichTextRenderer.vue'
+import DraftToggle from './components/DraftToggle.vue'
 
-const payloadUsers = ref<any>(null)
+const page = ref<any>(null)
 const error = ref<string | null>(null)
+const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const res = await fetch('/api/users')
-    if (!res.ok) {
-      if (res.status === 403) {
-        throw new Error('403 Forbidden (Working specifically as expected! Payload blocks public access to /api/users by default)')
-      }
-      throw new Error(`Failed to fetch from Payload CMS: ${res.status} ${res.statusText}`)
+    const path = window.location.pathname
+    const isPreview = new URLSearchParams(window.location.search).get('preview') === 'true'
+
+    let query = ''
+    if (path === '/' || path === '') {
+      query = 'where[slug][equals]=home'
+    } else {
+      const slug = path.replace(/^\/|\/$/g, '')
+      query = `where[slug][equals]=${slug}`
     }
+
+    const statusFilter = isPreview ? '' : '&where[_status][equals]=published'
+    const draftParam = isPreview ? '&draft=true' : ''
+
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000)
+
+    const res = await fetch(`/api/pages?${query}${statusFilter}${draftParam}&limit=1`, { signal: controller.signal })
+    clearTimeout(timeoutId)
+
+    if (!res.ok) throw new Error(`API error: ${res.status} ${res.statusText}`)
+
     const data = await res.json()
-    payloadUsers.value = data
+    if (data.docs && data.docs.length > 0) {
+      page.value = data.docs[0]
+      error.value = null
+    } else {
+      // Fallback: Try to find a custom 404 page
+      const errorRes = await fetch(`/api/pages?where[slug][equals]=404&where[_status][equals]=published&limit=1`)
+      if (errorRes.ok) {
+        const errorData = await errorRes.json()
+        if (errorData.docs && errorData.docs.length > 0) {
+          page.value = errorData.docs[0]
+          error.value = null
+        } else {
+          page.value = null
+          error.value = 'Page not found'
+        }
+      } else {
+        page.value = null
+        error.value = 'Page not found'
+      }
+    }
   } catch (e: any) {
-    error.value = e.message
+    if (e.name === 'AbortError') {
+      error.value = 'CMS is taking too long to respond. Is it running?'
+    } else {
+      error.value = e.message
+    }
+  } finally {
+    loading.value = false
   }
 })
 </script>
 
 <template>
-  <HelloWorld />
+  <GlobalNav />
 
-  <div class="api-test-container">
-    <h2>Payload API Data (Proxy Test)</h2>
-    <p v-if="error" class="error-text">Error: {{ error }}</p>
-    <pre v-else-if="payloadUsers" class="api-output">
-      {{ JSON.stringify(payloadUsers, null, 2) }}
-    </pre>
-    <p v-else>Loading payload data...</p>
-  </div>
+  <main class="page-content">
+    <div v-if="loading" class="loading-state">
+      <div class="loader"></div>
+      <p>Loading your site...</p>
+    </div>
+
+    <div v-else-if="error" class="error-state">
+      <h2>Oops!</h2>
+      <p>{{ error }}</p>
+    </div>
+
+    <div v-else-if="page" class="page-container">
+      <h1 class="page-title">{{ page.title }}</h1>
+      <div class="page-body">
+        <RichTextRenderer v-if="page.content?.root" :content="page.content.root" />
+        <p v-else>No content yet</p>
+      </div>
+    </div>
+
+    <div v-else class="not-found-state">
+      <h2>Welcome!</h2>
+      <p>Please go to the CMS and create some pages.</p>
+    </div>
+  </main>
+
+  <GlobalFooter />
+  <DraftToggle :page-id="page?.id" />
 </template>
 
 <style scoped lang="scss">

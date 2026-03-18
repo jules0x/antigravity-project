@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "categories": {
+    "correctness": "warn",
+    "suspicious": "warn",
+    "nursery": "off",
+    "pedantic": "off",
+    "perf": "off",
+    "style": "off"
+  },
+  "rules": {
+    "no-debugger": "error",
+    "no-console": "warn",
+    "no-unused-vars": "warn"
+  },
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.payload/**",
+    "**/payload-types.ts",
+    "**/.nuxt/**",
+    "**/.output/**",
+    "**/.vscode/**"
+  ]
+}
