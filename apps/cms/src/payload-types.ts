@@ -299,6 +299,11 @@ export interface Item {
     };
     [k: string]: unknown;
   } | null;
+  category?: string | null;
+  keywords?: string | null;
+  uploadDate?: string | null;
+  likes?: string | null;
+  subscribersCount?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -310,6 +315,10 @@ export interface Author {
   id: number;
   name: string;
   avatar?: (number | null) | Media;
+  /**
+   * External avatar URL (e.g. from YouTube)
+   */
+  externalAvatar?: string | null;
   subscribers?: string | null;
   verified?: boolean | null;
   updatedAt: string;
@@ -730,6 +739,11 @@ export interface ItemsSelect<T extends boolean = true> {
   label2?: T;
   image?: T;
   technicalNotes?: T;
+  category?: T;
+  keywords?: T;
+  uploadDate?: T;
+  likes?: T;
+  subscribersCount?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -740,6 +754,7 @@ export interface ItemsSelect<T extends boolean = true> {
 export interface AuthorsSelect<T extends boolean = true> {
   name?: T;
   avatar?: T;
+  externalAvatar?: T;
   subscribers?: T;
   verified?: T;
   updatedAt?: T;

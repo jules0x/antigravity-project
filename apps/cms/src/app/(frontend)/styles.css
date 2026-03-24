@@ -11,6 +11,11 @@
   --color-text: #FFFFFF;
   --color-text-muted: #A0A0A0;
   
+  /* Background Bloom Colors */
+  --color-glow-1: rgba(189, 0, 255, 0.15); /* Purple */
+  --color-glow-2: rgba(0, 178, 255, 0.1);  /* Blue */
+  --color-glow-3: rgba(255, 77, 148, 0.1);  /* Pink */
+
   --glass-bg: rgba(255, 255, 255, 0.05);
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-blur: blur(12px);
@@ -44,7 +49,44 @@ body {
   line-height: 1.5;
   margin: 0;
   color: var(--color-text);
-  background: var(--color-bg);
+  position: relative;
+  overflow-x: hidden;
+
+  /* Immersive Underground Background (Fixed) */
+  &::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    background-image: 
+      /* Bloom Glows */
+      radial-gradient(circle at 80% 20%, var(--color-glow-1) 0%, transparent 40%),
+      radial-gradient(circle at 20% 80%, var(--color-glow-2) 0%, transparent 40%),
+      radial-gradient(circle at 50% -20%, rgba(26, 10, 46, 1) 0%, transparent 80%),
+      /* Technical Grid */
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+    background-attachment: fixed;
+    pointer-events: none;
+  }
+
+  /* Grain Texture Overlay */
+  &::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.03;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
 
   @media (max-width: 1024px) {
     font-size: 15px;

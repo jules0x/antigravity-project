@@ -9,7 +9,6 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import './details.css'
 import ItemActions from '../../components/ItemActions'
-import FavoritesSidebar from '../../components/FavoritesSidebar'
 import ShuffleControl from '../../components/ShuffleControl'
 import { seededShuffle } from '@/utilities/shuffle'
 
@@ -33,7 +32,7 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
     limit: 1,
   }).catch(() => ({ docs: [] }))
 
-  const item = items[0]
+  const item = items[0] as any
 
   if (!item) {
     return notFound()
@@ -66,7 +65,7 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
     collection: 'items',
     where: whereClause,
     sort: 'createdAt',
-    limit: shuffleSeed ? 40 : 6,
+    limit: shuffleSeed ? 40 : 24,
   })
 
   // If we reach the end of the catalog, wrap around to the beginning
@@ -81,7 +80,7 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
       collection: 'items',
       where: wrapWhereClause,
       sort: 'createdAt',
-      limit: 6 - related.length,
+      limit: 24 - related.length,
     })
     related = [...related, ...wrapAround]
   }
@@ -91,8 +90,9 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
     related = seededShuffle(related, shuffleSeed)
   }
 
-  // Take the final 6 for the UI
-  related = related.filter(Boolean).slice(0, 6)
+  // Split for UI: 6 for sidebar, next 12 for bottom grid
+  const sidebarItems = related.filter(Boolean).slice(0, 6)
+  const bottomGridItems = related.filter(Boolean).slice(6, 18)
 
   const isVideo = item.type === 'video'
   const author = item.author && typeof item.author === 'object' ? item.author : null
@@ -189,8 +189,12 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
         {/* Author Bar */}
         <div className="author-bar">
           <div className="author-info">
-            {author?.avatar && (
-              <img src={typeof author.avatar === 'object' ? (author.avatar.url || '') : ''} alt={author.name} className="author-avatar" />
+            {(author?.avatar || author?.externalAvatar) && (
+              <img
+                src={typeof author.avatar === 'object' ? (author.avatar.url || '') : (author.externalAvatar || '')}
+                alt={author.name}
+                className="author-avatar"
+              />
             )}
             <div className="author-details">
               <span className="author-name">
@@ -198,6 +202,57 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
               </span>
               <span className="author-subs">{author?.subscribers || '0'} SUBSCRIBERS</span>
             </div>
+          </div>
+        </div>
+
+        {/* Technical Specification Section */}
+        <div className="tech-specs">
+          <h2 className="tech-specs-title">Technical Specification</h2>
+          <div className="specs-grid">
+            <div className="spec-item">
+              <span className="spec-label">CATEGORY</span>
+              <span className="spec-value">{item.category || 'N/A'}</span>
+            </div>
+            <div className="spec-item">
+              <span className="spec-label">UPLOAD DATE</span>
+              <span className="spec-value">{item.uploadDate || 'N/A'}</span>
+            </div>
+            <div className="spec-item">
+              <span className="spec-label">KEYWORDS</span>
+              <span className="spec-value keywords-list">{item.keywords || 'N/A'}</span>
+            </div>
+            {item.likes && (
+              <div className="spec-item">
+                <span className="spec-label">LIKES</span>
+                <span className="spec-value">{item.likes}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Secondary Item Grid */}
+        <div className="secondary-grid-section">
+          <h2 className="tech-specs-title">Discover More</h2>
+          <div className="secondary-item-grid">
+            {bottomGridItems.map((rel: any) => (
+              <Link
+                href={`/gallery/${rel.slug || rel.id}${tagParam ? `?tag=${tagParam}` : ''}`}
+                key={rel.id}
+                className="grid-item-card"
+              >
+                <div className="grid-item-thumb-container">
+                  <img
+                    src={rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : (typeof rel.image === 'object' ? (rel.image?.url || '') : '')}
+                    alt={rel.title || 'Untitled'}
+                    className="grid-item-thumb"
+                  />
+                  {rel.duration && <span className="duration-tag">{rel.duration}</span>}
+                </div>
+                <div className="grid-item-info">
+                  <span className="grid-item-title">{rel.title}</span>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </div>
@@ -210,14 +265,14 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <ShuffleControl />
               {activeTagSlugs.length > 0 && (
-                <Link href={`/gallery/${item.slug || item.id}`}>
-                  CLEAR ✖
+                <Link href={`/gallery/${item.slug || item.id}`} style={{ textDecoration: 'none' }}>
+                  CLEAR
                 </Link>
               )}
             </div>
           </h3>
           <div className="related-list">
-            {(related as any[]).map((rel: any, index: number) => (
+            {sidebarItems.map((rel: any, index: number) => (
               <Link
                 href={`/gallery/${rel.slug || rel.id}${tagParam ? `?tag=${tagParam}` : ''}`}
                 key={rel.id}
@@ -235,13 +290,6 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
               </Link>
             ))}
           </div>
-        </div>
-
-        <div style={{ marginTop: '40px' }}>
-          <h3 className="sidebar-section-title">
-            Your Favorites
-          </h3>
-          <FavoritesSidebar />
         </div>
       </aside>
     </div>

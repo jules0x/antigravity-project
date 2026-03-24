@@ -8,6 +8,9 @@ const formatSlug = (val: string): string => {
 
 export const Items: CollectionConfig = {
   slug: 'items',
+  access: {
+    read: () => true,
+  },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'type', 'slug', 'updatedAt'],
@@ -19,18 +22,54 @@ export const Items: CollectionConfig = {
       required: true,
       hooks: {
         beforeValidate: [
-          async ({ value, data, operation }) => {
+          async ({ value, data, operation, req }) => {
             if ((operation === 'create' || operation === 'update') && data?.type === 'video' && data?.youtubeID && !value) {
               const metadata = await getYouTubeMetadata(data.youtubeID)
               if (metadata) {
-                // Pre-populate description if it's also empty
-                if (data && !data.description) {
-                  data.description = metadata.description
+                // 1. Handle Author Linking (Idempotent)
+                const authorRes = await req.payload.find({
+                  collection: 'authors',
+                  where: { name: { equals: metadata.authorName } },
+                })
+
+                let authorId
+                if (authorRes.totalDocs > 0) {
+                  authorId = authorRes.docs[0].id
+                  // Update existing author metadata if provided
+                  await req.payload.update({
+                    collection: 'authors',
+                    id: authorId,
+                    data: {
+                      subscribers: metadata.subscribers,
+                      externalAvatar: metadata.authorAvatar,
+                      verified: true as any,
+                    },
+                  })
+                } else {
+                  const newAuthor = await req.payload.create({
+                    collection: 'authors',
+                    data: {
+                      name: metadata.authorName,
+                      subscribers: metadata.subscribers,
+                      externalAvatar: metadata.authorAvatar,
+                      verified: true as any,
+                    },
+                  })
+                  authorId = newAuthor.id
                 }
-                // Deterministically set slug to prevent null during seeding
-                if (data && !data.slug) {
-                  data.slug = formatSlug(metadata.title)
+
+                // 2. Populate fields
+                if (data) {
+                  data.author = authorId
+                  data.description = data.description || metadata.description
+                  data.duration = data.duration || metadata.duration
+                  data.views = data.views || metadata.views
+                  data.category = data.category || metadata.category
+                  data.keywords = data.keywords || metadata.keywords
+                  data.uploadDate = data.uploadDate || metadata.uploadDate
+                  data.slug = data.slug || formatSlug(metadata.title)
                 }
+
                 return metadata.title
               }
             }
@@ -142,6 +181,31 @@ export const Items: CollectionConfig = {
     {
       name: 'technicalNotes',
       type: 'richText',
+    },
+    {
+      name: 'category',
+      type: 'text',
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'keywords',
+      type: 'text',
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'uploadDate',
+      type: 'text',
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'likes',
+      type: 'text',
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'subscribersCount', // Renamed to avoid confusion with author.subscribers if needed, but author.subscribers is better
+      type: 'text',
+      admin: { position: 'sidebar' },
     },
   ],
 }

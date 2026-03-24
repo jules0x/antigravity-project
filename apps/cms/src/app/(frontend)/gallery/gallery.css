@@ -1,5 +1,4 @@
 .gallery-container {
-  background-color: var(--color-bg);
   min-height: 100vh;
   padding: 80px 40px;
   color: var(--color-text);
@@ -19,7 +18,7 @@
   justify-content: space-between;
   align-items: flex-end;
   margin-bottom: 40px;
-  border-bottom: 1px solid var(--glass-border);
+  /* border-bottom: 1px solid var(--glass-border); */
   padding-bottom: 15px;
 }
 

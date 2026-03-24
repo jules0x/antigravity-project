@@ -1,0 +1,57 @@
+.favorites-toggle {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #000;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  box-shadow: 0 10px 25px rgba(0, 178, 255, 0.4);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.favorites-toggle:hover {
+  transform: scale(1.1) translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 178, 255, 0.6);
+}
+
+.favorites-toggle:active {
+  transform: scale(0.9);
+}
+
+.toggle-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--color-secondary);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 900;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  border: 2px solid #000;
+  animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
