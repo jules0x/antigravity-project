@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { getYouTubeMetadata } from '../utilities/youtube'
 
 // String to URL utility
 const formatSlug = (val: string): string => {
@@ -16,6 +17,27 @@ export const Items: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
+      hooks: {
+        beforeValidate: [
+          async ({ value, data, operation }) => {
+            if ((operation === 'create' || operation === 'update') && data?.type === 'video' && data?.youtubeID && !value) {
+              const metadata = await getYouTubeMetadata(data.youtubeID)
+              if (metadata) {
+                // Pre-populate description if it's also empty
+                if (data && !data.description) {
+                  data.description = metadata.description
+                }
+                // Deterministically set slug to prevent null during seeding
+                if (data && !data.slug) {
+                  data.slug = formatSlug(metadata.title)
+                }
+                return metadata.title
+              }
+            }
+            return value
+          },
+        ],
+      },
     },
     {
       name: 'slug',

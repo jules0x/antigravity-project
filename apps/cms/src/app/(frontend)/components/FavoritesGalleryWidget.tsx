@@ -71,10 +71,6 @@ export default function FavoritesGalleryWidget({ block }: { block?: any }) {
               )}
 
               <div className="fav-card-content">
-                <div className="fav-card-author">
-                  <img src={avatarUrl} alt={author?.name || 'Unknown'} className="fav-card-author-avatar" />
-                  <span className="fav-card-author-name">{author?.name || 'Abstract Mind'}</span>
-                </div>
                 <h3 className="fav-card-title">{rel.title}</h3>
               </div>
             </Link>

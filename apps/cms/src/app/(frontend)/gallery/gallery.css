@@ -126,14 +126,6 @@
   line-height: 1;
 }
 
-.tile-subtitle {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--color-primary);
-  margin-top: 5px;
-}
-
 /* The Underground Selection (Hero + 2 Side) */
 .selection-layout {
   display: grid;

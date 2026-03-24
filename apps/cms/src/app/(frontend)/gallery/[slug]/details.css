@@ -14,7 +14,42 @@
 .main-content {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 20px;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  color: var(--color-text-muted);
+}
+
+.breadcrumbs a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumbs a:hover {
+  color: var(--color-primary);
+}
+
+.breadcrumbs .separator {
+  opacity: 0.3;
+  font-weight: 400;
+}
+
+.breadcrumbs .current {
+  color: var(--color-primary);
+  opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
 }
 
 /* Video Player Header */
@@ -241,6 +276,45 @@
   align-items: center;
 }
 
+.shuffle-btn,
+.sidebar-section-title a {
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: var(--color-text-muted);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: var(--font-sans);
+  height: 28px;
+  line-height: 1;
+}
+
+.shuffle-btn:hover,
+.sidebar-section-title a:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(0, 178, 255, 0.05);
+}
+
+.shuffle-btn:active,
+.sidebar-section-title a:active {
+  transform: scale(0.95);
+}
+
+.sidebar-section-title span {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  font-weight: 900;
+  color: var(--color-primary);
+}
+
 .related-list {
   display: flex;
   flex-direction: column;
@@ -250,8 +324,27 @@
 .related-card {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.related-card:hover {
+  transform: translateX(4px);
+}
+
+.related-card.featured {
+  border: 2px solid var(--color-primary);
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(0, 178, 255, 0.03);
+  margin-bottom: 10px;
+  box-shadow: 0 0 30px rgba(0, 178, 255, 0.1);
+}
+
+.related-card.featured .related-title {
+  color: var(--color-primary);
+  font-size: 1rem;
 }
 
 .related-thumb-container {

@@ -51,13 +51,6 @@ const VIDEO_IDS = [
   'lJrCrtFfMVo', 'd8MBnc90nC4', 'HVGUmvIzmsw', 'YzStpP8JkDM', 'Grx5behEoV4'
 ]
 
-const TITLES = [
-  'BRUTALIST WHISPERS', 'BRAIN GLITCH', 'NEON ROT', 'EARTH\'S HEARTBEAT',
-  'COSMIC WOMB', 'SPECTRUM BLEED', 'ENDLESS NIGHT', 'DIGITAL SOUL',
-  'CONCRETE GHOST', 'FLUID CHAOS', 'STATIC NOISE', 'GRAVITY\'S END',
-  'TIME WARP', 'CODE BIRTH', 'NIGHT VIBES'
-]
-
 async function seed() {
   console.log('--- Reseeding Dynamic Gallery ---')
   const payload = await getPayload({ config })
@@ -99,9 +92,6 @@ async function seed() {
       continue
     }
 
-    const title = TITLES[validItemsCount % TITLES.length] + ` Part ${Math.floor(validItemsCount / TITLES.length) + 1}`
-    const explicitSlug = title.replace(/ /g, '-').replace(/[^\w-]+/g, '').toLowerCase()
-
     // Assign 2 or 3 tags per item pseudo-randomly but deterministically
     const numTags = 2 + (validItemsCount % 2)
     const itemTags = []
@@ -112,17 +102,14 @@ async function seed() {
     const item = await payload.create({
       collection: 'items',
       data: {
-        title: title,
-        slug: explicitSlug,
-        subtitle: `Vol. ${validItemsCount + 1}`,
-        description: `Archival footage #00${validItemsCount}. Exploring structural and visual artifacts.`,
-        type: 'video',
         youtubeID: vid,
+        type: 'video',
+        subtitle: `Vol. ${validItemsCount + 1}`,
         duration: '04:15',
         author: author.id,
         views: `${Math.floor(Math.random() * 900) + 10}K`,
         tags: itemTags,
-      },
+      } as any,
     })
     itemIds.push(item.id)
     validItemsCount++;

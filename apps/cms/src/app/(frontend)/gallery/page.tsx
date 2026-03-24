@@ -40,7 +40,6 @@ export default async function GalleryPage() {
       {/* Title Section */}
       <div className="gallery-section">
         <div style={{ marginBottom: '60px' }}>
-          <span style={{ color: 'var(--color-secondary)', fontSize: '0.8rem', fontWeight: 'bold' }}>— RAW DATA</span>
           <h1 style={{ margin: '10px 0', fontSize: '5rem', fontWeight: '950', textTransform: 'uppercase' }}>
             {page.title}
           </h1>
@@ -175,7 +174,6 @@ function GalleryTile({ item, type }: { item: any, type: 'feature' | 'minimal' })
       <img src={thumbnailUrl || ''} alt={item.title || 'Untitled'} className="tile-image" />
       <div className="tile-overlay">
         <h3 className="tile-title">{item.title}</h3>
-        {item.subtitle && <span className="tile-subtitle">{item.subtitle}</span>}
       </div>
     </Link>
   )
