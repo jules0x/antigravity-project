@@ -1969,18 +1969,30 @@
     sass "1.77.4"
     uuid "10.0.0"
 
-"@payloadcms/plugin-form-builder@3.79.1":
+"@payloadcms/plugin-import-export@3.79.1":
   version "3.79.1"
-  resolved "https://registry.yarnpkg.com/@payloadcms/plugin-form-builder/-/plugin-form-builder-3.79.1.tgz#dd9080a9b26243195dd06ee18ef7d01607545d09"
-  integrity sha512-DHFfJM43Wg3IceUSVIxEooIiK14A7d+bKewxJ3og2w5k4zXY+09PDmImWaCe6sHNpZhISb4PI5KZ8k10dftFiA==
+  resolved "https://registry.yarnpkg.com/@payloadcms/plugin-import-export/-/plugin-import-export-3.79.1.tgz#474a703ed0f09de5fd9bb45c29b6e82deb1fa3db"
+  integrity sha512-825qyIFjSvfb5F3Bb2o3QlN8Mw3UdZebVoQ7aMQNu00jzMdOd5wuGHjBY70WET6XLKrxQyc1mDui+RoiCFAAUQ==
   dependencies:
+    "@faceless-ui/modal" "3.0.0"
+    "@payloadcms/translations" "3.79.1"
     "@payloadcms/ui" "3.79.1"
-    escape-html "^1.0.3"
+    csv-parse "5.6.0"
+    csv-stringify "6.5.2"
+    qs-esm "7.0.2"
 
 "@payloadcms/plugin-nested-docs@^3.79.1":
   version "3.79.1"
   resolved "https://registry.yarnpkg.com/@payloadcms/plugin-nested-docs/-/plugin-nested-docs-3.79.1.tgz#90b8e35109a87bc3d3b5e2a51ce95ba67513c1fa"
   integrity sha512-Tu211v0vz+zZl5o0iG6pFOiZcAs+BF68miCoCT/R5fvjGEuqOqB2j7psBwf4XOgm2swO/OLHZygQaCuGw/l3cg==
+
+"@payloadcms/plugin-redirects@3.79.1":
+  version "3.79.1"
+  resolved "https://registry.yarnpkg.com/@payloadcms/plugin-redirects/-/plugin-redirects-3.79.1.tgz#119c27d1bf48aed020e28a8be29d5b1d240114b9"
+  integrity sha512-g7LlTF5B2wDawcD2367WvqCy8g4/BbApGuVN3avOBtNEyWEhDQ3jh0fbo6Coxoy7VU0y2l8JfkBcGtJp7IdK0g==
+  dependencies:
+    "@payloadcms/translations" "3.79.1"
+    payload "3.79.1"
 
 "@payloadcms/plugin-search@3.79.1":
   version "3.79.1"
@@ -2627,6 +2639,14 @@
   dependencies:
     "@typescript-eslint/types" "8.57.1"
     eslint-visitor-keys "^5.0.0"
+
+"@unhead/vue@^2.1.12":
+  version "2.1.12"
+  resolved "https://registry.yarnpkg.com/@unhead/vue/-/vue-2.1.12.tgz#e5798784b1815299971b7acb19f570ee8dcb5128"
+  integrity sha512-zEWqg0nZM8acpuTZE40wkeUl8AhIe0tU0OkilVi1D4fmVjACrwoh5HP6aNqJ8kUnKsoy6D+R3Vi/O+fmdNGO7g==
+  dependencies:
+    hookable "^6.0.1"
+    unhead "2.1.12"
 
 "@unrs/resolver-binding-android-arm-eabi@1.11.1":
   version "1.11.1"
@@ -3512,6 +3532,16 @@ csstype@^3.0.2, csstype@^3.2.2, csstype@^3.2.3:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.2.3.tgz#ec48c0f3e993e50648c86da559e2610995cf989a"
   integrity sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==
 
+csv-parse@5.6.0:
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-5.6.0.tgz#219beace2a3e9f28929999d2aa417d3fb3071c7f"
+  integrity sha512-l3nz3euub2QMg5ouu5U09Ew9Wf6/wQ8I++ch1loQ0ljmzhmfZYrH9fflS22i/PQEvsPvxCwxgz5q7UB8K1JO4Q==
+
+csv-stringify@6.5.2:
+  version "6.5.2"
+  resolved "https://registry.yarnpkg.com/csv-stringify/-/csv-stringify-6.5.2.tgz#b51d61cd949906d5b5b790463f3055d95915193e"
+  integrity sha512-RFPahj0sXcmUyjrObAK+DOWtMvMIFV328n4qZJhgX3x2RqkQgOTU2mCUmiFR0CzM6AzChlRSUErjiJeEt8BaQA==
+
 damerau-levenshtein@^1.0.8:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/damerau-levenshtein/-/damerau-levenshtein-1.0.8.tgz#b43d286ccbd36bc5b2f7ed41caf2d0aba1f8a6e7"
@@ -3976,7 +4006,7 @@ escalade@^3.2.0:
   resolved "https://registry.yarnpkg.com/escalade/-/escalade-3.2.0.tgz#011a3f69856ba189dffa7dc8fcce99d2a87903e5"
   integrity sha512-WUj2qlxaQtO4g6Pq5c29GTcWGDyd8itL8zTlipgECz3JesAiiOKotd8JU6otB3PACgG6xkJUyVhboMS+bje/jA==
 
-escape-html@1.0.3, escape-html@^1.0.3:
+escape-html@1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/escape-html/-/escape-html-1.0.3.tgz#0258eae4d3d0c0974de1c169188ef0051d1d1988"
   integrity sha512-NiSupZ4OeuGwr68lGIeym/ksIZMJodUGOSCZ/FSnTxcrekbvqrgdUxlJOMpijaKZVjAJrWrGs/6Jy8OMuyj9ow==
@@ -4661,6 +4691,11 @@ hoist-non-react-statics@^3.3.1:
   integrity sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==
   dependencies:
     react-is "^16.7.0"
+
+hookable@^6.0.1:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/hookable/-/hookable-6.1.0.tgz#f9eb1c39928b5c6db4e8884155d402420030555e"
+  integrity sha512-ZoKZSJgu8voGK2geJS+6YtYjvIzu9AOM/KZXsBxr83uhLL++e9pEv/dlgwgy3dvHg06kTz6JOh1hk3C8Ceiymw==
 
 hookified@^1.14.0, hookified@^1.15.0, hookified@^1.15.1:
   version "1.15.1"
@@ -7439,6 +7474,13 @@ undici@^7.20.0:
   version "7.24.4"
   resolved "https://registry.yarnpkg.com/undici/-/undici-7.24.4.tgz#873bce680d7c6354c941399fd4e8ea4563de4ea7"
   integrity sha512-BM/JzwwaRXxrLdElV2Uo6cTLEjhSb3WXboncJamZ15NgUURmvlXvxa6xkwIOILIjPNo9i8ku136ZvWV0Uly8+w==
+
+unhead@2.1.12:
+  version "2.1.12"
+  resolved "https://registry.yarnpkg.com/unhead/-/unhead-2.1.12.tgz#21b524a43aefde352a1ada13e4802b5df48163a6"
+  integrity sha512-iTHdWD9ztTunOErtfUFk6Wr11BxvzumcYJ0CzaSCBUOEtg+DUZ9+gnE99i8QkLFT2q1rZD48BYYGXpOZVDLYkA==
+  dependencies:
+    hookable "^6.0.1"
 
 unicorn-magic@^0.4.0:
   version "0.4.0"

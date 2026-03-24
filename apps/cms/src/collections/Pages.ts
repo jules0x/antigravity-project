@@ -1,10 +1,14 @@
 import type { CollectionConfig } from 'payload'
+import { HeroBlock } from '../blocks/HeroBlock'
+import { GridBlock } from '../blocks/GridBlock'
+import { ListBlock } from '../blocks/ListBlock'
+import { FavoritesBlock } from '../blocks/FavoritesBlock'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
   versions: {
     drafts: true,
-    maxPerDoc: 20, // Keeps the most recent 20 revisions
+    maxPerDoc: 20,
   },
   access: {
     read: ({ req: { user } }) => {
@@ -12,7 +16,6 @@ export const Pages: CollectionConfig = {
       if (user) {
         return true
       }
-
       // Public users can ONLY read pages where the status is published
       return {
         _status: {
@@ -64,50 +67,12 @@ export const Pages: CollectionConfig = {
       },
     },
     {
-      name: 'excludeFromNav',
-      type: 'checkbox',
-      label: 'Exclude from Navigation?',
+      name: 'layout',
+      type: 'blocks',
+      blocks: [HeroBlock, GridBlock, ListBlock, FavoritesBlock],
       admin: {
-        position: 'sidebar',
-      },
-    },
-    {
-      name: 'content',
-      type: 'richText',
-    },
-    {
-      name: 'banner',
-      type: 'group',
-      label: 'Banner',
-      admin: {
-        description: 'Optional hero banner displayed at the top of the page.',
-      },
-      fields: [
-        {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
-          label: 'Banner Image',
-        },
-        {
-          name: 'text',
-          type: 'text',
-          label: 'Banner Text',
-          admin: {
-            description: 'Overlay text displayed on the banner image.',
-          },
-        },
-      ],
-    },
-    {
-      name: 'form',
-      type: 'relationship',
-      relationTo: 'forms',
-      label: 'Embedded Form',
-      admin: {
-        description: 'Optionally attach a form to this page (created via the Forms collection).',
+        description: 'Build your page layout using these blocks.',
       },
     },
   ],
 }
-

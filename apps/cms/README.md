@@ -27,3 +27,6 @@ To spin up the entire stack locally, follow these steps:
 ## Features
 - Content management configured for the Antigravity frontend.
 - Supports Draft Previews across published and draft collections.
+- **SEO Management:** Configurable SEO metadata (titles, descriptions, images) for Pages and Items.
+- **Redirects:** Dedicated collection to handle 301/302 HTTP redirects.
+- **Import/Export:** Bulk data management (CSV/JSON) enabled on relevant collections.

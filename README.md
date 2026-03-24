@@ -56,11 +56,15 @@ Admins can append `?preview=true` to any frontend URL to view unpublished draft 
 ### Modular SCSS Architecture
 Frontend styles are split into `base/`, `layout/`, and `components/` partials, all imported through a single `main.scss` entry point, making the stylesheet easy to extend without conflicts.
 
-### Form Builder
-Uses `@payloadcms/plugin-form-builder` to let editors create forms (text, email, textarea, select, etc.) entirely within the CMS admin. Attach a form to any page via the **Embedded Form** field and it renders automatically in the frontend via `FormRenderer.vue`, which handles field rendering, validation, and submission back to the `form-submissions` collection.
-
 ### Page Banner
 Editors can add a hero banner to any page via the **Banner** group in the CMS. This includes an image upload field (linked to the `media` collection) and an optional overlay text field. The `PageBanner.vue` component handles the responsive rendering of the image with a subtle gradient overlay for text readability.
+
+### Standard CMS Plugins
+Implemented official `@payloadcms` plugins to provide essential content management workflows directly within the Next.js/Payload 3 backend:
+- **Advanced SEO Management:** Uses `@foundrykit/advanced-seo-plugin` to provide comprehensive SEO controls, including a dedicated "SEO" sidebar group for `pages` and `items`. It automatically generates `<title>` and canonical `<meta>` tags, and supports robots directives (`noindex`/`nofollow`) and JSON-LD structured data.
+- **Redirects:** Adds a `Redirects` collection, allowing administrators to map obsolete URLs to active ones using 301 (Permanent) or 302 (Temporary) HTTP status codes for the frontend.
+- **Import/Export:** Introduces "Import" and "Export" actions to the `pages` and `items` collections, enabling bulk content transfers via CSV or JSON directly from the list views.
+- **Form Builder:** Uses `@payloadcms/plugin-form-builder` to let editors create forms (text, email, textarea, select, etc.) entirely within the CMS admin. Attach a form to any page via the **Embedded Form** field and it renders automatically in the frontend via `FormRenderer.vue`, which handles field rendering, validation, and submission back to the `form-submissions` collection.
 
 ---
 

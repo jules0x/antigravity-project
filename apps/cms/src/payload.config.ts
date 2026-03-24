@@ -9,10 +9,13 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Items } from './collections/Items'
+import { Authors } from './collections/Authors'
+import { Tags } from './collections/Tags'
 import { Footer } from './globals/Footer'
+
 import { searchPlugin } from '@payloadcms/plugin-search'
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
-import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
+import { importExportPlugin } from '@payloadcms/plugin-import-export'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -24,7 +27,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Pages, Items],
+  collections: [Users, Media, Pages, Items, Authors, Tags],
   globals: [Footer],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
@@ -56,20 +59,8 @@ export default buildConfig({
       generateLabel: (_, doc) => doc.title as string,
       generateURL: (docs) => docs.reduce((url, doc) => `${url}/${doc.slug}`, ''),
     }),
-    formBuilderPlugin({
-      fields: {
-        payment: false, // disable payment field (no payment processor configured)
-      },
-      formOverrides: {
-        admin: {
-          group: 'Content',
-        },
-      },
-      formSubmissionOverrides: {
-        admin: {
-          group: 'Content',
-        },
-      },
+    importExportPlugin({
+      collections: [{ slug: 'pages' }, { slug: 'items' }],
     }),
   ],
 })
