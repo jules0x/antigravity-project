@@ -1,12 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @next/next/no-img-element */
-/* eslint-disable react/no-unescaped-entities */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { getPayload } from 'payload'
 import React from 'react'
 import config from '@/payload.config'
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
+import { TransitionLink } from '../../components/TransitionLink'
+import { VideoPlayer } from '../../components/VideoPlayer'
 import './details.css'
 import ItemActions from '../../components/ItemActions'
 import ShuffleControl from '../../components/ShuffleControl'
@@ -102,19 +99,17 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
       <div className="main-content">
         {/* Breadcrumbs */}
         <nav className="breadcrumbs">
-          <Link href="/gallery">GALLERY</Link>
+          <TransitionLink href="/gallery">GALLERY</TransitionLink>
           <span className="separator">/</span>
           <span className="current">{item.title}</span>
         </nav>
 
         {/* Video Player */}
-        <div className="video-header">
+        <div className="video-header" style={{ viewTransitionName: `thumbnail-${item.slug || item.id}` }}>
           {isVideo ? (
-            <iframe
-              src={`https://www.youtube.com/embed/${item.youtubeID}?autoplay=1&controls=1&showinfo=0&rel=0&modestbranding=1`}
-              className="video-player"
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
+            <VideoPlayer 
+              youtubeID={item.youtubeID} 
+              nextUrl={sidebarItems[0] ? `/gallery/${sidebarItems[0].slug || sidebarItems[0].id}${activeTagSlugs.length > 0 ? `?tag=${activeTagSlugs.join(',')}` : ''}` : undefined}
             />
           ) : (
             <img
@@ -151,13 +146,13 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
               const nextUrl = `${baseUrl}?${queryParams.toString()}`
 
               return (
-                <Link
+                <TransitionLink
                   href={nextUrl}
                   key={tagObj.id}
                   className={`label-pill ${colorClass} ${isActive ? 'active' : ''}`}
                 >
                   {tagName}
-                </Link>
+                </TransitionLink>
               )
             })}
           </div>
@@ -166,7 +161,7 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
             <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
               <ItemActions itemId={item.id} />
               {(related as any[])[0] && (
-                <Link
+                <TransitionLink
                   href={`/gallery/${(related as any[])[0].slug || (related as any[])[0].id}${tagParam ? `?tag=${tagParam}` : ''}`}
                   className="skip-btn"
                   aria-label="Play Next"
@@ -175,7 +170,7 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
                   <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style={{ marginLeft: '2px' }}>
                     <path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z" />
                   </svg>
-                </Link>
+                </TransitionLink>
               )}
             </div>
           </div>
@@ -235,10 +230,11 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
           <h2 className="tech-specs-title">Discover More</h2>
           <div className="secondary-item-grid">
             {bottomGridItems.map((rel: any) => (
-              <Link
-                href={`/gallery/${rel.slug || rel.id}${tagParam ? `?tag=${tagParam}` : ''}`}
+              <TransitionLink
+                href={`/gallery/${rel.slug || rel.id}`}
                 key={rel.id}
                 className="grid-item-card"
+                style={{ viewTransitionName: `thumbnail-${rel.slug || rel.id}` }}
               >
                 <div className="grid-item-thumb-container">
                   <img
@@ -251,7 +247,7 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
                 <div className="grid-item-info">
                   <span className="grid-item-title">{rel.title}</span>
                 </div>
-              </Link>
+              </TransitionLink>
             ))}
           </div>
         </div>
@@ -265,30 +261,34 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <ShuffleControl />
               {activeTagSlugs.length > 0 && (
-                <Link href={`/gallery/${item.slug || item.id}`} style={{ textDecoration: 'none' }}>
+                <TransitionLink href={`/gallery/${item.slug || item.id}`} style={{ textDecoration: 'none' }}>
                   CLEAR
-                </Link>
+                </TransitionLink>
               )}
             </div>
           </h3>
-          <div className="related-list">
-            {sidebarItems.map((rel: any, index: number) => (
-              <Link
-                href={`/gallery/${rel.slug || rel.id}${tagParam ? `?tag=${tagParam}` : ''}`}
-                key={rel.id}
-                className={`related-card ${index === 0 ? 'featured' : ''}`}
-              >
-                <div className="related-thumb-container">
-                  <img
-                    src={rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : (typeof rel.image === 'object' ? (rel.image?.url || '') : '')}
-                    alt={rel.title || 'Untitled'}
-                    className="related-thumb"
-                  />
-                  {rel.duration && <span className="duration-tag">{rel.duration}</span>}
-                </div>
-                <span className="related-title">{rel.title}</span>
-              </Link>
-            ))}
+          <div className="related-list" style={{ viewTransitionName: 'sidebar-list' }}>
+            {sidebarItems.map((rel: any, index: number) => {
+              const tagParam = activeTagSlugs.join(',')
+              return (
+                <TransitionLink
+                  href={`/gallery/${rel.slug || rel.id}${tagParam ? `?tag=${tagParam}` : ''}`}
+                  key={rel.id}
+                  className={`related-card ${index === 0 ? 'featured' : ''}`}
+                  style={{ viewTransitionName: `thumbnail-${rel.slug || rel.id}` }}
+                >
+                  <div className="related-thumb-container">
+                    <img
+                      src={rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : (typeof rel.image === 'object' ? (rel.image?.url || '') : '')}
+                      alt={rel.title || 'Untitled'}
+                      className="related-thumb"
+                    />
+                    {rel.duration && <span className="duration-tag">{rel.duration}</span>}
+                  </div>
+                  <span className="related-title">{rel.title}</span>
+                </TransitionLink>
+              )
+            })}
           </div>
         </div>
       </aside>

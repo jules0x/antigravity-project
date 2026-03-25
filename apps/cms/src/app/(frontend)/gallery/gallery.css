@@ -136,7 +136,7 @@
   position: relative;
   border-radius: 12px;
   overflow: hidden;
-  background-color: var(--color-surface);
+  background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--glass-border);
   height: 100%;
   text-decoration: none;
@@ -229,7 +229,7 @@
   flex: 0 0 200px;
   aspect-ratio: 1/1.2;
   position: relative;
-  background-color: var(--color-surface);
+  background-color: rgba(255, 255, 255, 0.03);
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--glass-border);

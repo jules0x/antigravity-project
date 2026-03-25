@@ -88,3 +88,40 @@
     width: 100%;
   }
 }
+
+.favorite-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+}
+
+.favorite-item .related-title {
+  flex: 1;
+}
+
+.remove-favorite {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  opacity: 0.5;
+  margin-top: -4px;
+}
+
+.remove-favorite:hover {
+  color: var(--color-primary);
+  background: rgba(0, 178, 255, 0.1);
+  opacity: 1;
+}
+
+.remove-favorite svg {
+  pointer-events: none;
+}

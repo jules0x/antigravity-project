@@ -46,10 +46,6 @@
 .breadcrumbs .current {
   color: var(--color-primary);
   opacity: 0.8;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 300px;
 }
 
 /* Video Player Header */

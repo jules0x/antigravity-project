@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable react/no-unescaped-entities */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { getPayload } from 'payload'
 import React from 'react'
 import config from '@/payload.config'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { TransitionLink } from '../components/TransitionLink'
 import './gallery.css'
 import FavoritesGalleryWidget from '../components/FavoritesGalleryWidget'
 import '../components/FavoritesGalleryWidget.css'
@@ -77,9 +76,9 @@ function GridBlockRenderer({ block }: { block: any }) {
           <h2 className="section-title">{block.title}</h2>
           {block.subtitle && <p className="section-intro">{block.subtitle}</p>}
         </div>
-        <Link href="#" className="dig-deeper">
+        <TransitionLink href="#" className="dig-deeper">
           Dig Deeper <span>→</span>
-        </Link>
+        </TransitionLink>
       </header>
       <div className="obsessions-grid">
         {items.map((item: any) => (
@@ -113,7 +112,7 @@ function HeroBlockRenderer({ block }: { block: any }) {
             <h3 className="hero-title">{heroItem.title}</h3>
             <p className="hero-description">{heroItem.description}</p>
             <div className="hero-actions">
-              <Link href={`/gallery/${heroItem.slug || heroItem.id}`} className="btn btn-primary">Dive In</Link>
+              <TransitionLink href={`/gallery/${heroItem.slug || heroItem.id}`} className="btn btn-primary">Dive In</TransitionLink>
             </div>
           </div>
         </div>
@@ -162,20 +161,20 @@ function GalleryTile({ item, type }: { item: any, type: 'feature' | 'minimal' })
 
   if (type === 'minimal') {
     return (
-      <Link href={`/gallery/${item.slug || item.id}`} className="minimal-tile">
+      <TransitionLink href={`/gallery/${item.slug || item.id}`} className="minimal-tile">
         <img src={thumbnailUrl || ''} alt={item.title || 'Untitled'} className="minimal-tile-image" />
         <span className="minimal-title">{item.title}</span>
-      </Link>
+      </TransitionLink>
     )
   }
 
   return (
-    <Link href={`/gallery/${item.slug || item.id}`} className="feature-tile">
+    <TransitionLink href={`/gallery/${item.slug || item.id}`} className="feature-tile">
       <img src={thumbnailUrl || ''} alt={item.title || 'Untitled'} className="tile-image" />
       <div className="tile-overlay">
         <h3 className="tile-title">{item.title}</h3>
       </div>
-    </Link>
+    </TransitionLink>
   )
 }
 

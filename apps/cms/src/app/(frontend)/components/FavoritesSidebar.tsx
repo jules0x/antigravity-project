@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
+import { TransitionLink } from './TransitionLink'
 
 export default function FavoritesSidebar() {
   const [favorites, setFavorites] = useState<any[]>([])
@@ -27,6 +27,15 @@ export default function FavoritesSidebar() {
     }
   }
 
+  const handleRemove = (id: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const favs = JSON.parse(localStorage.getItem('antigravity_favorites') || '[]')
+    const newFavs = favs.filter((f: any) => f !== id)
+    localStorage.setItem('antigravity_favorites', JSON.stringify(newFavs))
+    window.dispatchEvent(new CustomEvent('favoritesUpdated'))
+  }
+
   useEffect(() => {
     loadFavorites()
     
@@ -46,7 +55,12 @@ export default function FavoritesSidebar() {
   return (
     <div className="related-list favorites-list">
       {favorites.map((rel: any) => (
-        <Link href={`/gallery/${rel.slug || rel.id}`} key={rel.id} className="related-card" style={{ borderLeft: '2px solid var(--color-primary)', paddingLeft: '8px', marginLeft: '-10px' }}>
+        <TransitionLink 
+          href={`/gallery/${rel.slug || rel.id}`} 
+          key={rel.id} 
+          className="related-card favorite-item" 
+          style={{ borderLeft: '2px solid var(--color-primary)', paddingLeft: '8px', marginLeft: '-10px', position: 'relative' }}
+        >
           <div className="related-thumb-container">
             <img 
               src={rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : (typeof rel.image === 'object' ? rel.image?.url : '')} 
@@ -54,8 +68,20 @@ export default function FavoritesSidebar() {
               className="related-thumb" 
             />
           </div>
-          <span className="related-title">{rel.title}</span>
-        </Link>
+          <div className="favorite-info">
+            <span className="related-title">{rel.title}</span>
+            <button 
+              className="remove-favorite" 
+              onClick={(e) => handleRemove(rel.id, e)}
+              title="Remove from archive"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </TransitionLink>
       ))}
     </div>
   )

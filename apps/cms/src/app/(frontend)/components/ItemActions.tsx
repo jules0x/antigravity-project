@@ -10,11 +10,15 @@ export default function ItemActions({ itemId }: { itemId: number | string }) {
     // Generate a stable fake like count for the UI
     setLikes(Math.floor(Math.random() * 50) + 10)
     
-    // Check localStorage for favorites
-    const favs = JSON.parse(localStorage.getItem('antigravity_favorites') || '[]')
-    if (favs.includes(itemId)) {
-      setIsFavorited(true)
+    const checkFavorite = () => {
+      const favs = JSON.parse(localStorage.getItem('antigravity_favorites') || '[]')
+      setIsFavorited(favs.includes(itemId))
     }
+
+    checkFavorite()
+    
+    window.addEventListener('favoritesUpdated', checkFavorite)
+    return () => window.removeEventListener('favoritesUpdated', checkFavorite)
   }, [itemId])
 
   const toggleFavorite = () => {
