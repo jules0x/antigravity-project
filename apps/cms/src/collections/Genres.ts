@@ -4,8 +4,8 @@ const formatSlug = (val: string): string => {
   return val.replace(/ /g, '-').replace(/[^\w-]+/g, '').toLowerCase()
 }
 
-export const Tags: CollectionConfig = {
-  slug: 'tags',
+export const Genres: CollectionConfig = {
+  slug: 'genres',
   access: {
     read: () => true,
   },
@@ -45,11 +45,13 @@ export const Tags: CollectionConfig = {
       name: 'color',
       type: 'select',
       options: [
-        { label: 'Primary (Blue)', value: 'primary' },
-        { label: 'Secondary (Pink)', value: 'secondary' },
-        { label: 'Tertiary (Purple)', value: 'tertiary' },
+        { label: 'Indigo', value: 'indigo' },
+        { label: 'Emerald', value: 'emerald' },
+        { label: 'Rose', value: 'rose' },
+        { label: 'Amber', value: 'amber' },
+        { label: 'Cyan', value: 'cyan' },
       ],
-      defaultValue: 'primary',
+      defaultValue: 'indigo',
     },
   ],
 }

@@ -10,7 +10,9 @@ import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Items } from './collections/Items'
 import { Authors } from './collections/Authors'
-import { Tags } from './collections/Tags'
+import { Genres } from './collections/Genres'
+import { Albums } from './collections/Albums'
+import { Playlists } from './collections/Playlists'
 import { Footer } from './globals/Footer'
 
 import { searchPlugin } from '@payloadcms/plugin-search'
@@ -27,7 +29,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Pages, Items, Authors, Tags],
+  collections: [Users, Media, Pages, Items, Authors, Genres, Albums, Playlists],
   globals: [Footer],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

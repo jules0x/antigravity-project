@@ -14,7 +14,7 @@ To spin up the entire stack locally, follow these steps:
 
 1. Ensure you are in the project root directory (`antigravity-project`).
 2. Install dependencies:
-   ```bash
+   ```asbh
    yarn install
    ```
 3. Start the development servers for both apps:

@@ -72,7 +72,9 @@ export interface Config {
     pages: Page;
     items: Item;
     authors: Author;
-    tags: Tag;
+    genres: Genre;
+    albums: Album;
+    playlists: Playlist;
     search: Search;
     exports: Export;
     imports: Import;
@@ -89,7 +91,9 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     items: ItemsSelect<false> | ItemsSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
-    tags: TagsSelect<false> | TagsSelect<true>;
+    genres: GenresSelect<false> | GenresSelect<true>;
+    albums: AlbumsSelect<false> | AlbumsSelect<true>;
+    playlists: PlaylistsSelect<false> | PlaylistsSelect<true>;
     search: SearchSelect<false> | SearchSelect<true>;
     exports: ExportsSelect<false> | ExportsSelect<true>;
     imports: ImportsSelect<false> | ImportsSelect<true>;
@@ -273,7 +277,10 @@ export interface Item {
    */
   duration?: string | null;
   author?: (number | null) | Author;
-  tags?: (number | Tag)[] | null;
+  /**
+   * Whether music metadata has been fetched for this item
+   */
+  wasEnriched?: boolean | null;
   views?: string | null;
   /**
    * Primary pill label (e.g. "4K ULTRA HD")
@@ -304,6 +311,9 @@ export interface Item {
   uploadDate?: string | null;
   likes?: string | null;
   subscribersCount?: string | null;
+  genres?: (number | Genre)[] | null;
+  album?: (number | null) | Album;
+  playlist?: (number | null) | Playlist;
   updatedAt: string;
   createdAt: string;
 }
@@ -326,13 +336,47 @@ export interface Author {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tags".
+ * via the `definition` "genres".
  */
-export interface Tag {
+export interface Genre {
   id: number;
   name: string;
   slug?: string | null;
-  color?: ('primary' | 'secondary' | 'tertiary') | null;
+  color?: ('indigo' | 'emerald' | 'rose' | 'amber' | 'cyan') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "albums".
+ */
+export interface Album {
+  id: number;
+  title: string;
+  slug?: string | null;
+  artist: number | Author;
+  releaseDate?: string | null;
+  image?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "playlists".
+ */
+export interface Playlist {
+  id: number;
+  title: string;
+  /**
+   * The URL of the YouTube playlist to import
+   */
+  youtubeURL: string;
+  status?: ('pending' | 'importing' | 'finished' | 'error') | null;
+  /**
+   * Genres to apply to all imported items
+   */
+  genres?: (number | Genre)[] | null;
+  importedCount?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -569,8 +613,16 @@ export interface PayloadLockedDocument {
         value: number | Author;
       } | null)
     | ({
-        relationTo: 'tags';
-        value: number | Tag;
+        relationTo: 'genres';
+        value: number | Genre;
+      } | null)
+    | ({
+        relationTo: 'albums';
+        value: number | Album;
+      } | null)
+    | ({
+        relationTo: 'playlists';
+        value: number | Playlist;
       } | null)
     | ({
         relationTo: 'search';
@@ -733,7 +785,7 @@ export interface ItemsSelect<T extends boolean = true> {
   youtubeID?: T;
   duration?: T;
   author?: T;
-  tags?: T;
+  wasEnriched?: T;
   views?: T;
   label1?: T;
   label2?: T;
@@ -744,6 +796,9 @@ export interface ItemsSelect<T extends boolean = true> {
   uploadDate?: T;
   likes?: T;
   subscribersCount?: T;
+  genres?: T;
+  album?: T;
+  playlist?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -762,12 +817,38 @@ export interface AuthorsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tags_select".
+ * via the `definition` "genres_select".
  */
-export interface TagsSelect<T extends boolean = true> {
+export interface GenresSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   color?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "albums_select".
+ */
+export interface AlbumsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  artist?: T;
+  releaseDate?: T;
+  image?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "playlists_select".
+ */
+export interface PlaylistsSelect<T extends boolean = true> {
+  title?: T;
+  youtubeURL?: T;
+  status?: T;
+  genres?: T;
+  importedCount?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -969,7 +1050,18 @@ export interface TaskCreateCollectionExport {
     id: string;
     name: string;
     batchSize?: number | null;
-    collectionSlug: 'users' | 'media' | 'pages' | 'items' | 'authors' | 'tags' | 'search' | 'exports' | 'imports';
+    collectionSlug:
+      | 'users'
+      | 'media'
+      | 'pages'
+      | 'items'
+      | 'authors'
+      | 'genres'
+      | 'albums'
+      | 'playlists'
+      | 'search'
+      | 'exports'
+      | 'imports';
     drafts?: ('yes' | 'no') | null;
     exportCollection: string;
     fields?: string[] | null;

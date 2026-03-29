@@ -1,5 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { getYouTubeMetadata } from '../utilities/youtube'
+import { getMusicMetadata } from '../utilities/musicbrainz'
+import { enrichItem } from '../utilities/enrichItem'
 
 // String to URL utility
 const formatSlug = (val: string): string => {
@@ -22,55 +24,18 @@ export const Items: CollectionConfig = {
       required: true,
       hooks: {
         beforeValidate: [
-          async ({ value, data, operation, req }) => {
-            if ((operation === 'create' || operation === 'update') && data?.type === 'video' && data?.youtubeID && !value) {
-              const metadata = await getYouTubeMetadata(data.youtubeID)
-              if (metadata) {
-                // 1. Handle Author Linking (Idempotent)
-                const authorRes = await req.payload.find({
-                  collection: 'authors',
-                  where: { name: { equals: metadata.authorName } },
-                })
-
-                let authorId
-                if (authorRes.totalDocs > 0) {
-                  authorId = authorRes.docs[0].id
-                  // Update existing author metadata if provided
-                  await req.payload.update({
-                    collection: 'authors',
-                    id: authorId,
-                    data: {
-                      subscribers: metadata.subscribers,
-                      externalAvatar: metadata.authorAvatar,
-                      verified: true as any,
-                    },
-                  })
-                } else {
-                  const newAuthor = await req.payload.create({
-                    collection: 'authors',
-                    data: {
-                      name: metadata.authorName,
-                      subscribers: metadata.subscribers,
-                      externalAvatar: metadata.authorAvatar,
-                      verified: true as any,
-                    },
-                  })
-                  authorId = newAuthor.id
-                }
-
-                // 2. Populate fields
-                if (data) {
-                  data.author = authorId
-                  data.description = data.description || metadata.description
-                  data.duration = data.duration || metadata.duration
-                  data.views = data.views || metadata.views
-                  data.category = data.category || metadata.category
-                  data.keywords = data.keywords || metadata.keywords
-                  data.uploadDate = data.uploadDate || metadata.uploadDate
-                  data.slug = data.slug || formatSlug(metadata.title)
-                }
-
-                return metadata.title
+          async ({ value, data, operation, req, originalDoc }) => {
+            const youtubeID = data?.youtubeID || originalDoc?.youtubeID
+            const type = data?.type || originalDoc?.type
+            
+            if ((operation === 'create' || operation === 'update') && type === 'video' && youtubeID) {
+              if (data) {
+                if (!data.youtubeID) data.youtubeID = youtubeID
+                if (!data.type) data.type = type
+              }
+              const enriched = await enrichItem(req.payload as any, data)
+              if (enriched?.title) {
+                return enriched.title
               }
             }
             return value
@@ -146,10 +111,13 @@ export const Items: CollectionConfig = {
       relationTo: 'authors',
     },
     {
-      name: 'tags',
-      type: 'relationship',
-      relationTo: 'tags',
-      hasMany: true,
+      name: 'wasEnriched',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description: 'Whether music metadata has been fetched for this item',
+      },
     },
     {
       name: 'views',
@@ -203,8 +171,27 @@ export const Items: CollectionConfig = {
       admin: { position: 'sidebar' },
     },
     {
-      name: 'subscribersCount', // Renamed to avoid confusion with author.subscribers if needed, but author.subscribers is better
+      name: 'subscribersCount',
       type: 'text',
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'genres',
+      type: 'relationship',
+      relationTo: 'genres',
+      hasMany: true,
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'album',
+      type: 'relationship',
+      relationTo: 'albums',
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'playlist',
+      type: 'relationship',
+      relationTo: 'playlists',
       admin: { position: 'sidebar' },
     },
   ],

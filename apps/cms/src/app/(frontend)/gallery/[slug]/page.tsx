@@ -8,12 +8,41 @@ import './details.css'
 import ItemActions from '../../components/ItemActions'
 import ShuffleControl from '../../components/ShuffleControl'
 import { seededShuffle } from '@/utilities/shuffle'
+import { Metadata } from 'next'
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await props.params
+  const payload = await getPayload({ config })
+  
+  const { docs: items } = await payload.find({
+    collection: 'items',
+    where: {
+      or: [
+        { slug: { equals: slug } },
+        { id: { equals: !isNaN(Number(slug)) ? Number(slug) : slug } }
+      ]
+    },
+    limit: 1,
+  }).catch(() => ({ docs: [] }))
+
+  const item = items[0] as any
+  
+  return {
+    title: item ? `${item.title} | Antigravity` : 'Antigravity Gallery',
+  }
+}
 
 export default async function ItemDetailPage(props: { params: Promise<{ slug: string }>, searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const { slug } = await props.params
   const searchParams = await props.searchParams
-  const tagParam = typeof searchParams.tag === 'string' ? searchParams.tag : ''
-  const activeTagSlugs = tagParam ? tagParam.split(',').filter(Boolean) : []
+  const genreParam = typeof searchParams.genre === 'string' ? searchParams.genre : ''
+  const albumParam = typeof searchParams.album === 'string' ? searchParams.album : ''
+  const playlistParam = typeof searchParams.playlist === 'string' ? searchParams.playlist : ''
+  const activeGenreSlugs = genreParam ? genreParam.split(',').filter(Boolean) : []
+  let activePlaylist: any = null
 
   const payload = await getPayload({ config })
 
@@ -35,61 +64,131 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
     return notFound()
   }
 
-  let activeTagNames: string[] = []
-  let activeTagIds: any[] = []
+  let activeGenreNames: string[] = []
+  let activeGenreIds: any[] = []
 
-  if (activeTagSlugs.length > 0) {
-    const { docs: tags } = await payload.find({
-      collection: 'tags',
-      where: { slug: { in: activeTagSlugs } },
+  if (activeGenreSlugs.length > 0) {
+    const { docs: genres } = await payload.find({
+      collection: 'genres',
+      where: { slug: { in: activeGenreSlugs } },
       limit: 10,
     })
-    activeTagNames = tags.map((t) => t.name)
-    activeTagIds = tags.map((t) => t.id)
+    activeGenreIds = genres.map((g) => g.id)
+    activeGenreNames = genres.map((g) => g.name)
   }
 
-  const whereClause: any = {
-    type: { equals: item.type },
-    createdAt: { greater_than: item.createdAt },
-    id: { not_equals: item.id }, // Failsafe for identical timestamps
+  if (playlistParam) {
+    const playlistDoc = await payload.findByID({
+      collection: 'playlists',
+      id: playlistParam,
+    }).catch(() => null)
+    if (playlistDoc) {
+      activePlaylist = playlistDoc
+    }
   }
-  if (activeTagIds.length > 0) whereClause.tags = { in: activeTagIds }
 
-  const shuffleSeed = typeof searchParams.shuffle === 'string' ? searchParams.shuffle : null
-
-  // Fetch a stable list of upcoming items (forward in time)
-  let { docs: related } = await payload.find({
+  const { docs: allGenres } = await payload.find({
+    collection: 'genres',
+    limit: 100,
+  })
+  
+  // Calculate which genres have the most items
+  const { docs: allItems } = await payload.find({
     collection: 'items',
-    where: whereClause,
-    sort: 'createdAt',
-    limit: shuffleSeed ? 40 : 24,
+    limit: 5000,
+    depth: 0,
+    select: { genres: true }
+  })
+  
+  const genreCounts: Record<string, number> = {}
+  for (const i of allItems) {
+    if (Array.isArray(i.genres)) {
+      for (const g of i.genres) {
+        const gId = String(typeof g === 'object' ? g.id : g)
+        genreCounts[gId] = (genreCounts[gId] || 0) + 1
+      }
+    }
+  }
+
+  // Exclude current item genres
+  const itemGenreIds = Array.isArray(item.genres) 
+    ? item.genres.map((g: any) => String(typeof g === 'object' ? g.id : g)) 
+    : []
+  
+  const availableGenres = allGenres.filter((g: any) => {
+    const stringId = String(g.id)
+    return !itemGenreIds.includes(stringId) && (genreCounts[stringId] || 0) > 0
   })
 
-  // If we reach the end of the catalog, wrap around to the beginning
-  if (related.length < 6) {
-    const wrapWhereClause: any = {
-      type: { equals: item.type },
-      createdAt: { less_than: item.createdAt },
-    }
-    if (activeTagIds.length > 0) wrapWhereClause.tags = { in: activeTagIds }
+  // Sort by count (descending)
+  availableGenres.sort((a, b) => (genreCounts[String(b.id)] || 0) - (genreCounts[String(a.id)] || 0))
+  
+  // Take top 20 most popular, then deterministically shuffle so there's some variety per item
+  const topPopularGenres = availableGenres.slice(0, 20)
+  const discoverGenres = seededShuffle(topPopularGenres, String(item.id)).slice(0, 5)
 
-    const { docs: wrapAround } = await payload.find({
-      collection: 'items',
-      where: wrapWhereClause,
-      sort: 'createdAt',
-      limit: 24 - related.length,
-    })
-    related = [...related, ...wrapAround]
-  }
+  // Fetch items for the sidebar / grid
+  let related: any[] = []
+  const shuffleSeed = typeof searchParams.shuffle === 'string' ? searchParams.shuffle : null
 
-  // Shuffle logic
   if (shuffleSeed) {
-    related = seededShuffle(related, shuffleSeed)
+    // DEEP SHUFFLE: Fetch a large pool from the entire filtered collection
+    const deepWhere: any = { type: { equals: item.type } }
+    if (activeGenreIds.length > 0) deepWhere.genres = { in: activeGenreIds }
+    if (albumParam) deepWhere.album = { equals: albumParam }
+    if (playlistParam) deepWhere.playlist = { equals: playlistParam }
+
+    const { docs: allPossible } = await payload.find({
+      collection: 'items',
+      where: deepWhere,
+      limit: 200, // Large pool for deep shuffling
+      depth: 2,
+    })
+    
+    // Remove current item and shuffle
+    const otherItems = allPossible.filter(i => i.id !== item.id)
+    related = seededShuffle(otherItems, shuffleSeed)
+  } else {
+    // SEQUENTIAL: Fetch upcoming items forward in time
+    const whereClause: any = {
+      type: { equals: item.type },
+      createdAt: { greater_than: item.createdAt },
+      id: { not_equals: item.id },
+    }
+    if (activeGenreIds.length > 0) whereClause.genres = { in: activeGenreIds }
+    if (albumParam) whereClause.album = { equals: albumParam }
+    if (playlistParam) whereClause.playlist = { equals: playlistParam }
+
+    let { docs: sequential } = await payload.find({
+      collection: 'items',
+      where: whereClause,
+      sort: 'createdAt',
+      limit: 100,
+    })
+
+    // Wrap around to the beginning if we hit the end
+    if (sequential.length < 8) {
+      const wrapWhereClause: any = {
+        type: { equals: item.type },
+        createdAt: { less_than: item.createdAt },
+      }
+      if (activeGenreIds.length > 0) wrapWhereClause.genres = { in: activeGenreIds }
+      if (playlistParam) wrapWhereClause.playlist = { equals: playlistParam }
+
+      const { docs: wrapAround } = await payload.find({
+        collection: 'items',
+        where: wrapWhereClause,
+        sort: 'createdAt',
+        limit: 100 - sequential.length,
+      })
+      sequential = [...sequential, ...wrapAround]
+    }
+    related = sequential
   }
 
-  // Split for UI: 6 for sidebar, next 12 for bottom grid
-  const sidebarItems = related.filter(Boolean).slice(0, 6)
-  const bottomGridItems = related.filter(Boolean).slice(6, 18)
+  // Split for UI: 8 for sidebar, next 92 for bottom grid
+  const sidebarItems = related.filter(Boolean).slice(0, 8)
+  const bottomGridItems = related.filter(Boolean).slice(8, 100)
 
   const isVideo = item.type === 'video'
   const author = item.author && typeof item.author === 'object' ? item.author : null
@@ -101,15 +200,29 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
         <nav className="breadcrumbs">
           <TransitionLink href="/gallery">GALLERY</TransitionLink>
           <span className="separator">/</span>
+          {activePlaylist ? (
+            <>
+              <TransitionLink href={`/gallery?playlist=${activePlaylist.id}`}>{activePlaylist.title.toUpperCase()}</TransitionLink>
+              <span className="separator">/</span>
+            </>
+          ) : activeGenreNames.length > 0 ? (
+            <>
+              <span className="current">{activeGenreNames.join(' + ').toUpperCase()}</span>
+              <span className="separator">/</span>
+            </>
+          ) : null}
           <span className="current">{item.title}</span>
         </nav>
 
         {/* Video Player */}
         <div className="video-header" style={{ viewTransitionName: `thumbnail-${item.slug || item.id}` }}>
           {isVideo ? (
-            <VideoPlayer 
-              youtubeID={item.youtubeID} 
-              nextUrl={sidebarItems[0] ? `/gallery/${sidebarItems[0].slug || sidebarItems[0].id}${activeTagSlugs.length > 0 ? `?tag=${activeTagSlugs.join(',')}` : ''}` : undefined}
+            <VideoPlayer
+              youtubeID={item.youtubeID}
+              nextUrl={sidebarItems[0] ? `/gallery/${sidebarItems[0].slug || sidebarItems[0].id}?${new URLSearchParams({
+                ...(genreParam ? { genre: genreParam } : {}),
+                ...(playlistParam ? { playlist: playlistParam } : {}),
+              }).toString()}` : undefined}
             />
           ) : (
             <img
@@ -123,24 +236,27 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
         {/* Title & Info */}
         <div className="item-info">
           <div className="labels-row">
-            {item.tags?.map((tag: any) => {
-              const tagObj = typeof tag === 'object' ? tag : null
-              if (!tagObj) return null
+            {item.genres?.map((genre: any) => {
+              const genreObj = typeof genre === 'object' ? genre : null
+              if (!genreObj) return null
 
-              const tagSlug = tagObj.slug || String(tagObj.id)
-              const tagName = tagObj.name || 'TAG'
-              const colorClass = tagObj.color || 'primary'
-              const isActive = activeTagSlugs.includes(tagSlug)
+              const genreSlug = genreObj.slug
+              const genreId = String(genreObj.id)
+              const genreName = genreObj.name || 'GENRE'
+              const colorClass = genreObj.color || 'secondary'
+
+              const currentIdentifier = genreSlug || genreId
+              const isActive = activeGenreSlugs.includes(genreSlug) || activeGenreSlugs.includes(genreId)
 
               // Multi-select toggle logic
-              const nextTags = isActive
-                ? activeTagSlugs.filter(s => s !== tagSlug)
-                : [...activeTagSlugs, tagSlug]
+              const nextGenres = isActive
+                ? activeGenreSlugs.filter(s => s !== genreSlug && s !== genreId)
+                : [...activeGenreSlugs, currentIdentifier]
 
               const nextSeed = Math.random().toString(36).substring(7)
               const baseUrl = `/gallery/${item.slug || item.id}`
               const queryParams = new URLSearchParams()
-              if (nextTags.length > 0) queryParams.set('tag', nextTags.join(','))
+              if (nextGenres.length > 0) queryParams.set('genre', nextGenres.join(','))
               queryParams.set('shuffle', nextSeed)
 
               const nextUrl = `${baseUrl}?${queryParams.toString()}`
@@ -148,13 +264,22 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
               return (
                 <TransitionLink
                   href={nextUrl}
-                  key={tagObj.id}
+                  key={genreObj.id}
                   className={`label-pill ${colorClass} ${isActive ? 'active' : ''}`}
                 >
-                  {tagName}
+                  {genreName.toUpperCase()}
                 </TransitionLink>
               )
             })}
+
+            {/* {item.album && typeof item.album === 'object' && (
+              <TransitionLink
+                href={`/gallery/${item.slug || item.id}?album=${item.album.id}&shuffle=${Math.random().toString(36).substring(7)}`}
+                className="label-pill tertiary"
+              >
+                ALBUM: {item.album.title.toUpperCase()}
+              </TransitionLink>
+            )} */}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px' }}>
             <h1 className="item-title">{item.title}</h1>
@@ -162,7 +287,10 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
               <ItemActions itemId={item.id} />
               {(related as any[])[0] && (
                 <TransitionLink
-                  href={`/gallery/${(related as any[])[0].slug || (related as any[])[0].id}${tagParam ? `?tag=${tagParam}` : ''}`}
+                  href={`/gallery/${(related as any[])[0].slug || (related as any[])[0].id}?${new URLSearchParams({
+                    ...(genreParam ? { genre: genreParam } : {}),
+                    ...(playlistParam ? { playlist: playlistParam } : {}),
+                  }).toString()}`}
                   className="skip-btn"
                   aria-label="Play Next"
                   title="Play Next"
@@ -175,53 +303,28 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
             </div>
           </div>
           <div className="item-stats">
-            <span>{item.views || '0'} VIEWS</span>
-            <span> </span>
-            <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+            {/* <span>{item.views || '0'} VIEWS</span> */}
+            {/* <span> </span> */}
+            {author && (
+              <>
+                {/* <span>•</span> */}
+                <span>{author.name.toUpperCase()}</span>
+              </>
+            )}
+            {/* <span>•</span> */}
+            {/* <span>{new Date(item.createdAt).toLocaleDateString()}</span> */}
           </div>
         </div>
 
-        {/* Author Bar */}
-        <div className="author-bar">
-          <div className="author-info">
-            {(author?.avatar || author?.externalAvatar) && (
-              <img
-                src={typeof author.avatar === 'object' ? (author.avatar.url || '') : (author.externalAvatar || '')}
-                alt={author.name}
-                className="author-avatar"
-              />
-            )}
-            <div className="author-details">
-              <span className="author-name">
-                {author?.name || 'Unknown Author'}
-              </span>
-              <span className="author-subs">{author?.subscribers || '0'} SUBSCRIBERS</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Technical Specification Section */}
-        <div className="tech-specs">
-          <h2 className="tech-specs-title">Technical Specification</h2>
-          <div className="specs-grid">
-            <div className="spec-item">
-              <span className="spec-label">CATEGORY</span>
-              <span className="spec-value">{item.category || 'N/A'}</span>
-            </div>
-            <div className="spec-item">
-              <span className="spec-label">UPLOAD DATE</span>
-              <span className="spec-value">{item.uploadDate || 'N/A'}</span>
-            </div>
-            <div className="spec-item">
-              <span className="spec-label">KEYWORDS</span>
-              <span className="spec-value keywords-list">{item.keywords || 'N/A'}</span>
-            </div>
-            {item.likes && (
-              <div className="spec-item">
-                <span className="spec-label">LIKES</span>
-                <span className="spec-value">{item.likes}</span>
-              </div>
-            )}
+        {/* Discover Genres */}
+        <div style={{ paddingTop: '20px' }}>
+          <h2 className="tech-specs-title" style={{ marginBottom: '16px' }}>Explore Obsessions</h2>
+          <div className="labels-row">
+            {discoverGenres.map((g: any) => (
+               <TransitionLink key={g.id} href={`/gallery/auto-play?genre=${g.slug}`} className={`label-pill ${g.color}`}>
+                 {g.name.toUpperCase()}
+               </TransitionLink>
+            ))}
           </div>
         </div>
 
@@ -238,7 +341,7 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
               >
                 <div className="grid-item-thumb-container">
                   <img
-                    src={rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : (typeof rel.image === 'object' ? (rel.image?.url || '') : '')}
+                    src={typeof rel.image === 'object' && rel.image?.url ? rel.image.url : (rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : '')}
                     alt={rel.title || 'Untitled'}
                     className="grid-item-thumb"
                   />
@@ -257,10 +360,12 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
       <aside className="sidebar">
         <div>
           <h3 className="sidebar-section-title">
-            <span>{activeTagNames.length > 0 ? `MORE ${activeTagNames.join(', ')}` : 'Related Masterpieces'}</span>
+            <span>
+              {activePlaylist ? `PLAYLIST: ${activePlaylist.title.toUpperCase()}` : (activeGenreNames.length > 0 ? `MORE ${activeGenreNames.join(', ')}` : 'Related Masterpieces')}
+            </span>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <ShuffleControl />
-              {activeTagSlugs.length > 0 && (
+              {(activeGenreSlugs.length > 0 || playlistParam) && (
                 <TransitionLink href={`/gallery/${item.slug || item.id}`} style={{ textDecoration: 'none' }}>
                   CLEAR
                 </TransitionLink>
@@ -269,17 +374,21 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
           </h3>
           <div className="related-list" style={{ viewTransitionName: 'sidebar-list' }}>
             {sidebarItems.map((rel: any, index: number) => {
-              const tagParam = activeTagSlugs.join(',')
+              const queryParams = new URLSearchParams()
+              if (genreParam) queryParams.set('genre', genreParam)
+              if (playlistParam) queryParams.set('playlist', playlistParam)
+              const queryString = queryParams.toString()
+              
               return (
                 <TransitionLink
-                  href={`/gallery/${rel.slug || rel.id}${tagParam ? `?tag=${tagParam}` : ''}`}
+                  href={`/gallery/${rel.slug || rel.id}${queryString ? `?${queryString}` : ''}`}
                   key={rel.id}
                   className={`related-card ${index === 0 ? 'featured' : ''}`}
                   style={{ viewTransitionName: `thumbnail-${rel.slug || rel.id}` }}
                 >
                   <div className="related-thumb-container">
                     <img
-                      src={rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : (typeof rel.image === 'object' ? (rel.image?.url || '') : '')}
+                      src={typeof rel.image === 'object' && rel.image?.url ? rel.image.url : (rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : '')}
                       alt={rel.title || 'Untitled'}
                       className="related-thumb"
                     />

@@ -1,0 +1,102 @@
+.genre-selector-container {
+  margin: 40px 0 60px 0;
+  width: 100%;
+}
+
+.genre-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+}
+
+.genre-tile {
+  aspect-ratio: 16 / 9;
+  background: rgba(15, 15, 15, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+.genre-tile-content {
+  z-index: 2;
+  text-align: center;
+  padding: 8px;
+}
+
+.genre-name {
+  color: #ccc;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: color 0.3s ease;
+}
+
+/* Base Hover Glows */
+.genre-tile:hover {
+  transform: translateY(-5px) scale(1.02);
+  background: rgba(30, 30, 30, 0.8);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.genre-tile:hover .genre-name {
+  color: #fff;
+}
+
+/* Color Specific Glows */
+.genre-tile.indigo:hover {
+  box-shadow: 0 10px 30px -5px rgba(99, 102, 241, 0.6);
+  border-color: rgba(99, 102, 241, 0.8);
+}
+
+.genre-tile.emerald:hover {
+  box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.6);
+  border-color: rgba(16, 185, 129, 0.8);
+}
+
+.genre-tile.rose:hover {
+  box-shadow: 0 10px 30px -5px rgba(244, 63, 94, 0.6);
+  border-color: rgba(244, 63, 94, 0.8);
+}
+
+.genre-tile.amber:hover {
+  box-shadow: 0 10px 30px -5px rgba(245, 158, 11, 0.6);
+  border-color: rgba(245, 158, 11, 0.8);
+}
+
+.genre-tile.cyan:hover {
+  box-shadow: 0 10px 30px -5px rgba(6, 182, 212, 0.6);
+  border-color: rgba(6, 182, 212, 0.8);
+}
+
+/* Subtle background pulse for the glow color */
+.genre-tile::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, var(--glow-rgba), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.genre-tile:hover::after {
+  opacity: 0.15;
+}
+
+/* CSS Variables for pulses */
+.genre-tile.indigo { --glow-rgba: rgba(99, 102, 241, 1); }
+.genre-tile.emerald { --glow-rgba: rgba(16, 185, 129, 1); }
+.genre-tile.rose { --glow-rgba: rgba(244, 63, 94, 1); }
+.genre-tile.amber { --glow-rgba: rgba(245, 158, 11, 1); }
+.genre-tile.cyan { --glow-rgba: rgba(6, 182, 212, 1); }

@@ -74,6 +74,7 @@
 
 .labels-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
@@ -125,6 +126,22 @@
   background: var(--color-tertiary);
   color: #000;
 }
+
+/* Specific Genre Colors */
+.label-pill.indigo { color: #818cf8; border-color: #818cf8; }
+.label-pill.indigo.active { background: #818cf8; color: #000; }
+
+.label-pill.emerald { color: #34d399; border-color: #34d399; }
+.label-pill.emerald.active { background: #34d399; color: #000; }
+
+.label-pill.rose { color: #fb7185; border-color: #fb7185; }
+.label-pill.rose.active { background: #fb7185; color: #000; }
+
+.label-pill.amber { color: #fbbf24; border-color: #fbbf24; }
+.label-pill.amber.active { background: #fbbf24; color: #000; }
+
+.label-pill.cyan { color: #22d3ee; border-color: #22d3ee; }
+.label-pill.cyan.active { background: #22d3ee; color: #000; }
 
 .item-title {
   font-size: 3.5rem;
@@ -459,7 +476,6 @@
 
 /* Secondary Grid Section */
 .secondary-grid-section {
-  margin-top: 60px;
   padding-top: 40px;
   /* border-top: 1px solid var(--glass-border); */
 }

@@ -7,8 +7,17 @@ import config from '@/payload.config'
 import { notFound } from 'next/navigation'
 import { TransitionLink } from '../components/TransitionLink'
 import './gallery.css'
-import FavoritesGalleryWidget from '../components/FavoritesGalleryWidget'
-import '../components/FavoritesGalleryWidget.css'
+import GenreSelector from '../components/GenreSelector'
+import PlaylistSelector from '../components/PlaylistSelector'
+import { Metadata } from 'next'
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+export const metadata: Metadata = {
+  title: 'Gallery | Antigravity',
+  description: 'A curated collection of visual and sonic obsessions.',
+}
 
 export default async function GalleryPage() {
   const payload = await getPayload({ config })
@@ -34,21 +43,47 @@ export default async function GalleryPage() {
   const page = pages[0]
   const layout = page.layout || []
 
+  // Fetch all genres for the selector
+  const { docs: allGenres } = await payload.find({
+    collection: 'genres',
+    limit: 100,
+    sort: 'name',
+  })
+
+  // Fetch all playlists with their first 4 items
+  const { docs: allPlaylists } = await payload.find({
+    collection: 'playlists',
+    limit: 20,
+    sort: '-createdAt',
+  })
+
+  // For each playlist, find some items to preview
+  const playlistsWithItems = await Promise.all(allPlaylists.map(async (playlist: any) => {
+    const { docs: items } = await payload.find({
+      collection: 'items',
+      where: {
+        playlist: { equals: playlist.id }
+      },
+      limit: 4,
+      sort: 'createdAt'
+    })
+    return { ...playlist, items }
+  }))
+
   return (
     <div className="gallery-container">
       {/* Title Section */}
       <div className="gallery-section">
-        <div style={{ marginBottom: '60px' }}>
+        <div style={{ marginBottom: '40px' }}>
           <h1 style={{ margin: '10px 0', fontSize: '5rem', fontWeight: '950', textTransform: 'uppercase' }}>
             {page.title}
           </h1>
+          <GenreSelector genres={allGenres as any[]} />
+          <PlaylistSelector playlists={playlistsWithItems as any[]} />
         </div>
       </div>
 
       {layout.map((block: any, index: number) => {
-        if (block.blockType === 'favorites') {
-          return <FavoritesGalleryWidget key={index} block={block} />
-        }
         if (block.blockType === 'grid') {
           return <GridBlockRenderer key={index} block={block} />
         }
@@ -155,9 +190,10 @@ function GalleryTile({ item, type }: { item: any, type: 'feature' | 'minimal' })
   if (!item || typeof item !== 'object') return null
   
   const isVideo = item.type === 'video'
+  const storedImageUrl = typeof item.image === 'object' && item.image?.url ? item.image.url : ''
   const thumbnailUrl = isVideo 
-    ? `https://img.youtube.com/vi/${item.youtubeID || ''}/hqdefault.jpg`
-    : (typeof item.image === 'object' ? item.image?.url : '')
+    ? (storedImageUrl || `https://img.youtube.com/vi/${item.youtubeID || ''}/hqdefault.jpg`)
+    : storedImageUrl
 
   if (type === 'minimal') {
     return (
@@ -182,9 +218,10 @@ function ItemMedia({ item, className }: { item: any, className?: string }) {
   if (!item || typeof item !== 'object') return null
 
   const isVideo = item.type === 'video'
+  const storedImageUrl = typeof item.image === 'object' && item.image?.url ? item.image.url : ''
   const imageUrl = isVideo 
-    ? `https://img.youtube.com/vi/${item.youtubeID || ''}/maxresdefault.jpg`
-    : (typeof item.image === 'object' ? item.image?.url : '')
+    ? (storedImageUrl || `https://img.youtube.com/vi/${item.youtubeID || ''}/maxresdefault.jpg`)
+    : storedImageUrl
 
   return <img src={imageUrl} alt={item.title || 'Untitled'} className={className} />
 }
