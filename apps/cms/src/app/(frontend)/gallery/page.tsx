@@ -16,7 +16,7 @@ export const revalidate = 0
 
 export const metadata: Metadata = {
   title: 'Gallery | Antigravity',
-  description: 'A curated collection of visual and sonic obsessions.',
+  description: 'A curated collection of visual and sonic vibes.',
 }
 
 export default async function GalleryPage() {
@@ -115,7 +115,7 @@ function GridBlockRenderer({ block }: { block: any }) {
           Dig Deeper <span>→</span>
         </TransitionLink>
       </header>
-      <div className="obsessions-grid">
+      <div className="vibes-grid">
         {items.map((item: any) => (
           <GalleryTile key={item.id} item={item} type="feature" />
         ))}

@@ -3,7 +3,7 @@ import { Block } from 'payload'
 export const GridBlock: Block = {
   slug: 'grid',
   labels: {
-    singular: 'Feature Grid (Obsessions)',
+    singular: 'Feature Grid (Vibes)',
     plural: 'Feature Grids',
   },
   fields: [
@@ -11,7 +11,7 @@ export const GridBlock: Block = {
       name: 'title',
       type: 'text',
       required: true,
-      defaultValue: "Today's Obsessions",
+      defaultValue: "Today's Vibes",
     },
     {
       name: 'subtitle',

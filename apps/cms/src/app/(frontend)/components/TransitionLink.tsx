@@ -30,7 +30,7 @@ export const TransitionLink = ({ children, href, className, style, ...props }: T
         router.push(href.toString())
         // Next.js doesn't provide a way to wait for the page to render.
         // We use a small timeout to allow the initial render to start.
-        setTimeout(resolve, 0)
+        setTimeout(resolve, 300)
       })
     })
   }

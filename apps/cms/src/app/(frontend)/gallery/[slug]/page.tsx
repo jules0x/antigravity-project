@@ -9,6 +9,7 @@ import ItemActions from '../../components/ItemActions'
 import ShuffleControl from '../../components/ShuffleControl'
 import { seededShuffle } from '@/utilities/shuffle'
 import { Metadata } from 'next'
+import { TiltCard } from '../../components/TiltCard'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -125,11 +126,13 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
   
   // Take top 20 most popular, then deterministically shuffle so there's some variety per item
   const topPopularGenres = availableGenres.slice(0, 20)
-  const discoverGenres = seededShuffle(topPopularGenres, String(item.id)).slice(0, 5)
-
-  // Fetch items for the sidebar / grid
-  let related: any[] = []
   const shuffleSeed = typeof searchParams.shuffle === 'string' ? searchParams.shuffle : null
+  const genreShuffleParam = typeof searchParams.genreShuffle === 'string' ? searchParams.genreShuffle : null
+
+  const genreShuffleSeed = genreShuffleParam || String(item.id)
+  const discoverGenres = seededShuffle(topPopularGenres, genreShuffleSeed).slice(0, 5)
+
+  let related: any[] = []
 
   if (shuffleSeed) {
     // DEEP SHUFFLE: Fetch a large pool from the entire filtered collection
@@ -294,6 +297,7 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
                   className="skip-btn"
                   aria-label="Play Next"
                   title="Play Next"
+                  style={{ viewTransitionName: 'next-button' }}
                 >
                   <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style={{ marginLeft: '2px' }}>
                     <path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z" />
@@ -316,9 +320,11 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
           </div>
         </div>
 
-        {/* Discover Genres */}
-        <div style={{ paddingTop: '20px' }}>
-          <h2 className="tech-specs-title" style={{ marginBottom: '16px' }}>Explore Obsessions</h2>
+        <div style={{ paddingTop: '20px', viewTransitionName: 'vibes-section' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h2 className="tech-specs-title" style={{ margin: 0 }}>Explore Vibes</h2>
+            <ShuffleControl paramName="genreShuffle" />
+          </div>
           <div className="labels-row">
             {discoverGenres.map((g: any) => (
                <TransitionLink key={g.id} href={`/gallery/auto-play?genre=${g.slug}`} className={`label-pill ${g.color}`}>
@@ -332,26 +338,32 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
         <div className="secondary-grid-section">
           <h2 className="tech-specs-title">Discover More</h2>
           <div className="secondary-item-grid">
-            {bottomGridItems.map((rel: any) => (
-              <TransitionLink
-                href={`/gallery/${rel.slug || rel.id}`}
-                key={rel.id}
-                className="grid-item-card"
-                style={{ viewTransitionName: `thumbnail-${rel.slug || rel.id}` }}
-              >
-                <div className="grid-item-thumb-container">
-                  <img
-                    src={typeof rel.image === 'object' && rel.image?.url ? rel.image.url : (rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : '')}
-                    alt={rel.title || 'Untitled'}
-                    className="grid-item-thumb"
-                  />
-                  {rel.duration && <span className="duration-tag">{rel.duration}</span>}
-                </div>
-                <div className="grid-item-info">
-                  <span className="grid-item-title">{rel.title}</span>
-                </div>
-              </TransitionLink>
-            ))}
+            {bottomGridItems.map((rel: any, index: number) => {
+              const glowColors = ['#818cf8', '#34d399', '#fb7185', '#fbbf24', '#22d3ee', '#a855f7', '#ec4899']
+              const glowColor = glowColors[index % glowColors.length]
+              
+              return (
+                <TiltCard key={rel.id} glowColor={glowColor}>
+                  <TransitionLink
+                    href={`/gallery/${rel.slug || rel.id}`}
+                    className="grid-item-card"
+                    style={{ viewTransitionName: `thumbnail-${rel.slug || rel.id}` }}
+                  >
+                    <div className="grid-item-thumb-container">
+                      <img
+                        src={typeof rel.image === 'object' && rel.image?.url ? rel.image.url : (rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : '')}
+                        alt={rel.title || 'Untitled'}
+                        className="grid-item-thumb"
+                      />
+                      {rel.duration && <span className="duration-tag">{rel.duration}</span>}
+                    </div>
+                    <div className="grid-item-info">
+                      <span className="grid-item-title">{rel.title}</span>
+                    </div>
+                  </TransitionLink>
+                </TiltCard>
+              )
+            })}
           </div>
         </div>
       </div>
@@ -384,9 +396,11 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
                   href={`/gallery/${rel.slug || rel.id}${queryString ? `?${queryString}` : ''}`}
                   key={rel.id}
                   className={`related-card ${index === 0 ? 'featured' : ''}`}
-                  style={{ viewTransitionName: `thumbnail-${rel.slug || rel.id}` }}
+                  style={{ 
+                    viewTransitionName: `sidebar-slot-${index}` 
+                  }}
                 >
-                  <div className="related-thumb-container">
+                  <div className="related-thumb-container" style={{ viewTransitionName: `thumbnail-${rel.slug || rel.id}` }}>
                     <img
                       src={typeof rel.image === 'object' && rel.image?.url ? rel.image.url : (rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : '')}
                       alt={rel.title || 'Untitled'}

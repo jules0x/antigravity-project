@@ -485,6 +485,8 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   margin-top: 30px;
+  transform-style: preserve-3d;
+  perspective: 2000px;
 }
 
 .grid-item-card {
@@ -493,11 +495,10 @@
   gap: 12px;
   text-decoration: none;
   transition: transform 0.2s ease;
+  transform-style: preserve-3d;
 }
 
-.grid-item-card:hover {
-  transform: translateY(-5px);
-}
+/* Removed hover transform to avoid conflict with TiltCard */
 
 .grid-item-thumb-container {
   position: relative;
@@ -527,6 +528,7 @@
   line-height: 1.2;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -548,4 +550,61 @@
   .secondary-item-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Shuffling & Navigation Animations */
+::view-transition-old(sidebar-slot-0),
+::view-transition-new(sidebar-slot-0),
+::view-transition-old(vibes-section),
+::view-transition-new(vibes-section),
+::view-transition-old(next-button),
+::view-transition-new(next-button) {
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+  animation-fill-mode: both;
+}
+
+/* Featured Card: keep container/border stable, cross-fade internal content */
+::view-transition-group(sidebar-slot-0) {
+  animation-duration: 0.6s;
+  overflow: hidden;
+}
+
+::view-transition-old(sidebar-slot-0),
+::view-transition-old(next-button) {
+  animation-name: fade-out, scale-down;
+}
+
+::view-transition-new(sidebar-slot-0),
+::view-transition-new(next-button) {
+  animation-name: fade-in, scale-up;
+}
+
+/* Vibes Section: Group fade */
+::view-transition-old(vibes-section) {
+  animation-name: fade-out;
+}
+
+::view-transition-new(vibes-section) {
+  animation-name: fade-in;
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-down {
+  from { transform: scale(1); }
+  to { transform: scale(0.95); }
+}
+
+@keyframes scale-up {
+  from { transform: scale(1.05); }
+  to { transform: scale(1); }
 }

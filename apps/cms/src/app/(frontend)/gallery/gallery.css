@@ -69,8 +69,8 @@
   opacity: 0.8;
 }
 
-/* Today's Obsessions Grid (2x4) */
-.obsessions-grid {
+/* Today's Vibes Grid (2x4) */
+.vibes-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
@@ -264,7 +264,7 @@
 
 /* Responsive */
 @media (max-width: 1200px) {
-  .obsessions-grid {
+  .vibes-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
@@ -279,7 +279,7 @@
 }
 
 @media (max-width: 768px) {
-  .obsessions-grid {
+  .vibes-grid {
     grid-template-columns: repeat(2, 1fr);
   }
   .hero-content {

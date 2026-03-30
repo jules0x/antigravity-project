@@ -3,7 +3,7 @@
 import React from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 
-export default function ShuffleControl() {
+export default function ShuffleControl({ paramName = 'shuffle', label = 'SHUFFLE' }: { paramName?: string, label?: string }) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -12,9 +12,22 @@ export default function ShuffleControl() {
     const params = new URLSearchParams(searchParams.toString())
     // Generate a new random seed
     const newSeed = Math.random().toString(36).substring(7)
-    params.set('shuffle', newSeed)
+    params.set(paramName, newSeed)
     
-    router.push(`${pathname}?${params.toString()}`)
+    // @ts-ignore
+    if (document.startViewTransition) {
+      // @ts-ignore
+      document.startViewTransition(() => {
+        return new Promise((resolve) => {
+          router.push(`${pathname}?${params.toString()}`)
+          // Next.js doesn't provide a way to wait for the page to render.
+          // We use a small timeout to allow the initial render to start.
+          setTimeout(resolve, 300)
+        })
+      })
+    } else {
+      router.push(`${pathname}?${params.toString()}`)
+    }
   }
 
   return (
@@ -31,7 +44,7 @@ export default function ShuffleControl() {
         <line x1="15" y1="15" x2="21" y2="21"></line>
         <line x1="4" y1="4" x2="9" y2="9"></line>
       </svg>
-      SHUFFLE
+      {label}
     </button>
   )
 }
