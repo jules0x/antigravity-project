@@ -557,26 +557,27 @@
 ::view-transition-new(sidebar-slot-0),
 ::view-transition-old(vibes-section),
 ::view-transition-new(vibes-section),
-::view-transition-old(next-button),
-::view-transition-new(next-button) {
+::view-transition-old(main-media-container),
+::view-transition-new(main-media-container) {
   animation-duration: 0.6s;
   animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
   animation-fill-mode: both;
 }
 
 /* Featured Card: keep container/border stable, cross-fade internal content */
-::view-transition-group(sidebar-slot-0) {
+::view-transition-group(sidebar-slot-0),
+::view-transition-group(main-media-container) {
   animation-duration: 0.6s;
   overflow: hidden;
 }
 
 ::view-transition-old(sidebar-slot-0),
-::view-transition-old(next-button) {
+::view-transition-old(main-media-container) {
   animation-name: fade-out, scale-down;
 }
 
 ::view-transition-new(sidebar-slot-0),
-::view-transition-new(next-button) {
+::view-transition-new(main-media-container) {
   animation-name: fade-in, scale-up;
 }
 
@@ -607,4 +608,40 @@
 @keyframes scale-up {
   from { transform: scale(1.05); }
   to { transform: scale(1); }
+}
+
+/* Heart Bubbles */
+.heart-bubble {
+  position: absolute;
+  bottom: 100%;
+  pointer-events: none;
+  z-index: 100;
+  animation-name: heart-rise-fade;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+  opacity: 0;
+}
+
+@keyframes heart-rise-fade {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.5);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-150px) translateX(var(--sway, 20px)) scale(1.2);
+    opacity: 0;
+  }
+}
+
+.heart-bubble:nth-child(even) {
+  --sway: -30px;
+}
+.heart-bubble:nth-child(3n) {
+  --sway: 15px;
+}
+.heart-bubble:nth-child(5n) {
+  --sway: -10px;
 }

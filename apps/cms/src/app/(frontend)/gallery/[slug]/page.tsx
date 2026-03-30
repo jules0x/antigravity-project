@@ -297,7 +297,7 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
                   className="skip-btn"
                   aria-label="Play Next"
                   title="Play Next"
-                  style={{ viewTransitionName: 'next-button' }}
+                  transitionName={`thumbnail-${(related as any[])[0]?.slug || (related as any[])[0]?.id}`}
                 >
                   <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style={{ marginLeft: '2px' }}>
                     <path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z" />
@@ -399,8 +399,9 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
                   style={{ 
                     viewTransitionName: `sidebar-slot-${index}` 
                   }}
+                  transitionName={`thumbnail-${rel.slug || rel.id}`}
                 >
-                  <div className="related-thumb-container" style={{ viewTransitionName: `thumbnail-${rel.slug || rel.id}` }}>
+                  <div className="related-thumb-container">
                     <img
                       src={typeof rel.image === 'object' && rel.image?.url ? rel.image.url : (rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : '')}
                       alt={rel.title || 'Untitled'}

@@ -10,13 +10,19 @@ interface TransitionLinkProps extends LinkProps {
   style?: React.CSSProperties
   'aria-label'?: string
   title?: string
+  transitionName?: string
 }
 
-export const TransitionLink = ({ children, href, className, style, ...props }: TransitionLinkProps) => {
+export const TransitionLink = ({ children, href, className, style, transitionName, ...props }: TransitionLinkProps) => {
   const router = useRouter()
 
   const handleTransition = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
+
+    const target = e.currentTarget
+    if (transitionName) {
+      target.style.viewTransitionName = transitionName
+    }
 
     // @ts-ignore - document.startViewTransition is not in all TS versions yet
     if (!document.startViewTransition) {
@@ -32,6 +38,13 @@ export const TransitionLink = ({ children, href, className, style, ...props }: T
         // We use a small timeout to allow the initial render to start.
         setTimeout(resolve, 300)
       })
+    })
+
+    // Clear the name after the transition is finished to avoid leaking
+    transition.finished.finally(() => {
+      if (target) {
+        target.style.viewTransitionName = ''
+      }
     })
   }
 

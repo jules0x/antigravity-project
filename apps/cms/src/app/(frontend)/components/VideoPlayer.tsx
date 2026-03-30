@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 interface VideoPlayerProps {
   youtubeID: string
   nextUrl?: string
+  style?: React.CSSProperties
 }
 
 declare global {
@@ -15,7 +16,7 @@ declare global {
   }
 }
 
-export const VideoPlayer: React.FC<VideoPlayerProps> = ({ youtubeID, nextUrl }) => {
+export const VideoPlayer: React.FC<VideoPlayerProps> = ({ youtubeID, nextUrl, style }) => {
   const playerRef = useRef<any>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const nextUrlRef = useRef(nextUrl)
@@ -90,7 +91,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ youtubeID, nextUrl }) 
   }, [youtubeID, router])
 
   return (
-    <div className="video-player-wrapper video-player" style={{ width: '100%', height: '100%' }}>
+    <div className="video-player-wrapper video-player" style={{ width: '100%', height: '100%', ...style }}>
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
     </div>
   )
