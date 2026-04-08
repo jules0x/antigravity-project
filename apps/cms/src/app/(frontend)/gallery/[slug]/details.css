@@ -92,8 +92,19 @@
 }
 
 .label-pill:hover {
-  opacity: 0.8;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  filter: brightness(1.2);
 }
+
+.label-pill.primary:hover { box-shadow: 0 0 15px var(--color-primary); }
+.label-pill.secondary:hover { box-shadow: 0 0 15px var(--color-secondary); }
+.label-pill.tertiary:hover { box-shadow: 0 0 15px var(--color-tertiary); }
+.label-pill.indigo:hover { box-shadow: 0 0 15px #818cf8; }
+.label-pill.emerald:hover { box-shadow: 0 0 15px #34d399; }
+.label-pill.rose:hover { box-shadow: 0 0 15px #fb7185; }
+.label-pill.amber:hover { box-shadow: 0 0 15px #fbbf24; }
+.label-pill.cyan:hover { box-shadow: 0 0 15px #22d3ee; }
 
 .label-pill:active {
   transform: scale(0.95);
@@ -385,12 +396,12 @@
   flex-direction: column;
   gap: 12px;
   text-decoration: none;
-  transition: transform 0.2s ease;
+  /* Removed transform transition to avoid conflict with TiltCard */
 }
 
-.related-card:hover {
+/* .related-card:hover {
   transform: translateX(4px);
-}
+} */
 
 .related-card.featured {
   border: 2px solid var(--color-primary);

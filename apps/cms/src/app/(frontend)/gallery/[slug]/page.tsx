@@ -391,26 +391,30 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
               if (playlistParam) queryParams.set('playlist', playlistParam)
               const queryString = queryParams.toString()
               
+              const glowColors = ['#818cf8', '#34d399', '#fb7185', '#fbbf24', '#22d3ee', '#a855f7', '#ec4899']
+              const glowColor = glowColors[index % glowColors.length]
+              
               return (
-                <TransitionLink
-                  href={`/gallery/${rel.slug || rel.id}${queryString ? `?${queryString}` : ''}`}
-                  key={rel.id}
-                  className={`related-card ${index === 0 ? 'featured' : ''}`}
-                  style={{ 
-                    viewTransitionName: `sidebar-slot-${index}` 
-                  }}
-                  transitionName={`thumbnail-${rel.slug || rel.id}`}
-                >
-                  <div className="related-thumb-container">
-                    <img
-                      src={typeof rel.image === 'object' && rel.image?.url ? rel.image.url : (rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : '')}
-                      alt={rel.title || 'Untitled'}
-                      className="related-thumb"
-                    />
-                    {rel.duration && <span className="duration-tag">{rel.duration}</span>}
-                  </div>
-                  <span className="related-title">{rel.title}</span>
-                </TransitionLink>
+                <TiltCard key={rel.id} glowColor={glowColor}>
+                  <TransitionLink
+                    href={`/gallery/${rel.slug || rel.id}${queryString ? `?${queryString}` : ''}`}
+                    className={`related-card ${index === 0 ? 'featured' : ''}`}
+                    style={{ 
+                      viewTransitionName: `sidebar-slot-${index}` 
+                    }}
+                    transitionName={`thumbnail-${rel.slug || rel.id}`}
+                  >
+                    <div className="related-thumb-container">
+                      <img
+                        src={typeof rel.image === 'object' && rel.image?.url ? rel.image.url : (rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : '')}
+                        alt={rel.title || 'Untitled'}
+                        className="related-thumb"
+                      />
+                      {rel.duration && <span className="duration-tag">{rel.duration}</span>}
+                    </div>
+                    <span className="related-title">{rel.title}</span>
+                  </TransitionLink>
+                </TiltCard>
               )
             })}
           </div>

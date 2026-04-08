@@ -1,0 +1,94 @@
+.volume-slider-container {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  opacity: 0.4;
+  transition: opacity 0.3s ease, margin-right 0.3s ease;
+  pointer-events: none; /* Container itself shouldn't block video interaction */
+}
+
+.video-player-wrapper:hover .volume-slider-container {
+  opacity: 1;
+}
+
+.volume-slider-track {
+  width: 4px;
+  height: 140px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  pointer-events: auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.volume-slider-fill {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: var(--color-primary, #00b2ff);
+  border-radius: 4px;
+  box-shadow: 0 0 10px var(--color-primary, #00b2ff);
+  transition: height 0.1s ease-out;
+}
+
+.volume-slider-thumb {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 
+              0 0 5px var(--color-primary, #00b2ff);
+  cursor: grab;
+  z-index: 2;
+  transition: bottom 0.1s ease-out;
+}
+
+.volume-slider-thumb:active {
+  cursor: grabbing;
+  transform: translate(-50%, 50%) scale(1.2);
+}
+
+.volume-icon {
+  margin-bottom: 12px;
+  color: #fff;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+}
+
+/* Spark Animations */
+.spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 20;
+  animation-name: spark-fly;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: forwards;
+  box-shadow: 0 0 8px currentColor;
+}
+
+@keyframes spark-fly {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx, 40px), var(--ty, 0px)) scale(0);
+    opacity: 0;
+  }
+}

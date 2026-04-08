@@ -27,8 +27,8 @@ export const TiltCard: React.FC<TiltCardProps> = ({ children, glowColor = 'var(-
     const centerY = rect.height / 2
 
     // Max rotation of 15 degrees
-    const rotateX = ((y - centerY) / centerY) * -15
-    const rotateY = ((x - centerX) / centerX) * 15
+    const rotateX = ((y - centerY) / centerY) * 15
+    const rotateY = ((x - centerX) / centerX) * -15
 
     setRotate({ x: rotateX, y: rotateY })
     setGlowPos({ x: (x / rect.width) * 100, y: (y / rect.height) * 100 })
