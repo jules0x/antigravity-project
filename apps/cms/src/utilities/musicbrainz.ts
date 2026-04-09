@@ -28,7 +28,7 @@ export async function getMusicMetadata(title: string, author: string): Promise<M
     console.log(`[MB] API URL (1): ${searchUrl}`)
     
     const searchRes = await fetch(searchUrl, {
-      headers: { 'User-Agent': 'Antigravity/1.0.0 ( julian@example.com )' }
+      headers: { 'User-Agent': 'Flux/1.0.0 ( julian@example.com )' }
     })
 
     if (!searchRes.ok) {
@@ -47,7 +47,7 @@ export async function getMusicMetadata(title: string, author: string): Promise<M
         console.log(`[MB] API URL (2): ${fallbackUrl}`)
         
         const fallbackRes = await fetch(fallbackUrl, {
-            headers: { 'User-Agent': 'Antigravity/1.0.0 ( julian@example.com )' }
+            headers: { 'User-Agent': 'Flux/1.0.0 ( julian@example.com )' }
         })
         if (fallbackRes.ok) {
             searchData = await fallbackRes.json()
@@ -76,7 +76,7 @@ export async function getMusicMetadata(title: string, author: string): Promise<M
     // 2. Lookup detailed info (genres, releases)
     const lookupUrl = `https://musicbrainz.org/ws/2/recording/${mbid}?inc=genres+releases&fmt=json`
     const lookupRes = await fetch(lookupUrl, {
-      headers: { 'User-Agent': 'Antigravity/1.0.0 ( julian@example.com )' }
+      headers: { 'User-Agent': 'Flux/1.0.0 ( julian@example.com )' }
     })
 
     if (!lookupRes.ok) {

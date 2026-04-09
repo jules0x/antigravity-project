@@ -7,6 +7,7 @@ interface Genre {
   name: string
   slug: string
   color?: string
+  count?: number
 }
 
 export default function GenreSelector({ genres }: { genres: Genre[] }) {
@@ -21,6 +22,7 @@ export default function GenreSelector({ genres }: { genres: Genre[] }) {
           >
             <div className="genre-tile-content">
               <span className="genre-name">{genre.name}</span>
+              {genre.count !== undefined && <span className="genre-count">{genre.count}</span>}
             </div>
           </TransitionLink>
         ))}

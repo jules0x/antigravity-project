@@ -1,3 +1,4 @@
+/* eslint-disable */
 const { createClient } = require('@libsql/client');
 require('dotenv').config({ path: '.env' });
 

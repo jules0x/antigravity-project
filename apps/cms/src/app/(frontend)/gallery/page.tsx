@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export const metadata: Metadata = {
-  title: 'Gallery | Antigravity',
+  title: 'Gallery | Flux',
   description: 'A curated collection of visual and sonic vibes.',
 }
 
@@ -43,12 +43,39 @@ export default async function GalleryPage() {
   const page = pages[0]
   const layout = page.layout || []
 
-  // Fetch all genres for the selector
-  const { docs: allGenres } = await payload.find({
+  // Fetch all genres initially
+  const { docs: allGenresRaw } = await payload.find({
     collection: 'genres',
-    limit: 100,
+    limit: 150,
     sort: 'name',
   })
+
+  // Calculate counts for each genre
+  const { docs: allItems } = await payload.find({
+    collection: 'items',
+    limit: 5000,
+    depth: 0,
+    select: { genres: true }
+  })
+
+  const genreCounts: Record<string, number> = {}
+  allItems.forEach((item: any) => {
+    if (Array.isArray(item.genres)) {
+      item.genres.forEach((gId: string | number) => {
+        const idStr = String(gId)
+        genreCounts[idStr] = (genreCounts[idStr] || 0) + 1
+      })
+    }
+  })
+
+  // Filter genres with at least 3 tracks, attach the count, and sort by popularity
+  const allGenres = allGenresRaw
+    .filter((g: any) => (genreCounts[String(g.id)] || 0) >= 3)
+    .map((g: any) => ({
+      ...g,
+      count: genreCounts[String(g.id)]
+    }))
+    .sort((a, b) => (b.count || 0) - (a.count || 0))
 
   // Fetch all playlists with their first 4 items
   const { docs: allPlaylists } = await payload.find({

@@ -32,7 +32,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   const item = items[0] as any
   
   return {
-    title: item ? `${item.title} | Antigravity` : 'Antigravity Gallery',
+    title: item ? `${item.title} | Flux` : 'Flux Gallery',
   }
 }
 
@@ -189,9 +189,9 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
     related = sequential
   }
 
-  // Split for UI: 8 for sidebar, next 92 for bottom grid
-  const sidebarItems = related.filter(Boolean).slice(0, 8)
-  const bottomGridItems = related.filter(Boolean).slice(8, 100)
+  // Split for UI: 3 for sidebar, next 97 for bottom grid
+  const sidebarItems = related.filter(Boolean).slice(0, 3)
+  const bottomGridItems = related.filter(Boolean).slice(3, 100)
 
   const isVideo = item.type === 'video'
   const author = item.author && typeof item.author === 'object' ? item.author : null
@@ -326,42 +326,37 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
             <ShuffleControl paramName="genreShuffle" />
           </div>
           <div className="labels-row">
-            {discoverGenres.map((g: any) => (
-               <TransitionLink key={g.id} href={`/gallery/auto-play?genre=${g.slug}`} className={`label-pill ${g.color}`}>
-                 {g.name.toUpperCase()}
-               </TransitionLink>
-            ))}
-          </div>
-        </div>
+            {discoverGenres.map((g: any) => {
+              const genreSlug = g.slug
+              const genreId = String(g.id)
+              const currentIdentifier = genreSlug || genreId
+              const isActive = activeGenreSlugs.includes(genreSlug) || activeGenreSlugs.includes(genreId)
 
-        {/* Secondary Item Grid */}
-        <div className="secondary-grid-section">
-          <h2 className="tech-specs-title">Discover More</h2>
-          <div className="secondary-item-grid">
-            {bottomGridItems.map((rel: any, index: number) => {
-              const glowColors = ['#818cf8', '#34d399', '#fb7185', '#fbbf24', '#22d3ee', '#a855f7', '#ec4899']
-              const glowColor = glowColors[index % glowColors.length]
+              // Multi-select toggle logic
+              const nextGenres = isActive
+                ? activeGenreSlugs.filter(s => s !== genreSlug && s !== genreId)
+                : [...activeGenreSlugs, currentIdentifier]
+
+              const nextSeed = Math.random().toString(36).substring(7)
+              const baseUrl = `/gallery/${item.slug || item.id}`
+              const queryParams = new URLSearchParams()
               
+              // Maintain other params
+              if (playlistParam) queryParams.set('playlist', playlistParam)
+              if (albumParam) queryParams.set('album', albumParam)
+              if (nextGenres.length > 0) queryParams.set('genre', nextGenres.join(','))
+              queryParams.set('shuffle', nextSeed)
+
+              const nextUrl = `${baseUrl}?${queryParams.toString()}`
+
               return (
-                <TiltCard key={rel.id} glowColor={glowColor}>
-                  <TransitionLink
-                    href={`/gallery/${rel.slug || rel.id}`}
-                    className="grid-item-card"
-                    style={{ viewTransitionName: `thumbnail-${rel.slug || rel.id}` }}
-                  >
-                    <div className="grid-item-thumb-container">
-                      <img
-                        src={typeof rel.image === 'object' && rel.image?.url ? rel.image.url : (rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : '')}
-                        alt={rel.title || 'Untitled'}
-                        className="grid-item-thumb"
-                      />
-                      {rel.duration && <span className="duration-tag">{rel.duration}</span>}
-                    </div>
-                    <div className="grid-item-info">
-                      <span className="grid-item-title">{rel.title}</span>
-                    </div>
-                  </TransitionLink>
-                </TiltCard>
+                <TransitionLink
+                  key={g.id}
+                  href={nextUrl}
+                  className={`label-pill ${g.color} ${isActive ? 'active' : ''}`}
+                >
+                  {g.name.toUpperCase()}
+                </TransitionLink>
               )
             })}
           </div>
@@ -420,6 +415,39 @@ export default async function ItemDetailPage(props: { params: Promise<{ slug: st
           </div>
         </div>
       </aside>
+
+      {/* Secondary Item Grid */}
+      <div className="secondary-grid-section">
+        <h2 className="tech-specs-title">Discover More</h2>
+        <div className="secondary-item-grid">
+          {bottomGridItems.map((rel: any, index: number) => {
+            const glowColors = ['#818cf8', '#34d399', '#fb7185', '#fbbf24', '#22d3ee', '#a855f7', '#ec4899']
+            const glowColor = glowColors[index % glowColors.length]
+            
+            return (
+              <TiltCard key={rel.id} glowColor={glowColor}>
+                <TransitionLink
+                  href={`/gallery/${rel.slug || rel.id}`}
+                  className="grid-item-card"
+                  style={{ viewTransitionName: `thumbnail-${rel.slug || rel.id}` }}
+                >
+                  <div className="grid-item-thumb-container">
+                    <img
+                      src={typeof rel.image === 'object' && rel.image?.url ? rel.image.url : (rel.type === 'video' ? `https://img.youtube.com/vi/${rel.youtubeID}/hqdefault.jpg` : '')}
+                      alt={rel.title || 'Untitled'}
+                      className="grid-item-thumb"
+                    />
+                    {rel.duration && <span className="duration-tag">{rel.duration}</span>}
+                  </div>
+                  <div className="grid-item-info">
+                    <span className="grid-item-title">{rel.title}</span>
+                  </div>
+                </TransitionLink>
+              </TiltCard>
+            )
+          })}
+        </div>
+      </div>
     </div>
   )
 }

@@ -37,7 +37,7 @@ async function verify() {
     category: updated.category,
     uploadDate: updated.uploadDate,
     duration: updated.duration,
-    author: typeof updated.author === 'object' ? updated.author.name : updated.author,
+    author: (updated.author && typeof updated.author === 'object') ? updated.author.name : updated.author,
     keywords: updated.keywords?.substring(0, 50) + '...',
   }, null, 2))
 

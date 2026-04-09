@@ -3,6 +3,7 @@ import { getPayload } from 'payload'
 import React from 'react'
 
 import config from '@/payload.config'
+import Link from 'next/link'
 import './styles.css'
 
 export default async function HomePage() {
@@ -25,12 +26,11 @@ export default async function HomePage() {
             {!user && "Log in"}
             {user && "Admin"}
           </a>
-          <a
+          <Link
             href="/gallery"
-            rel="noopener noreferrer"
           >
             Gallery
-          </a>
+          </Link>
           <a
             href="http://localhost:5173/?preview=true"
             rel="noopener noreferrer"

@@ -27,23 +27,23 @@ async function seed() {
   
   console.log(`Loaded ${VIDEO_IDS.length} IDs from manifest.`)
 
-  // 1. Create Tags (Idempotent)
-  console.log('Creating Tags...')
-  const tagIds = []
-  const tagsToCreate = [
-    { name: 'ABSTRACT', color: 'primary' },
-    { name: 'CINEMATIC', color: 'secondary' },
-    { name: 'TECH', color: 'tertiary' },
-    { name: 'AMBIENT', color: 'primary' },
-    { name: 'LO-FI', color: 'secondary' },
-  ]
+  // 1. Create Genres (Idempotent)
+  console.log('Creating Genres...')
+  const genreIds = []
+  const genresToCreate = [
+    { name: 'ABSTRACT', color: 'indigo' },
+    { name: 'CINEMATIC', color: 'rose' },
+    { name: 'TECH', color: 'cyan' },
+    { name: 'AMBIENT', color: 'indigo' },
+    { name: 'LO-FI', color: 'rose' },
+  ] as const
 
-  for (const t of tagsToCreate) {
-    const existing = await payload.find({ collection: 'tags', where: { name: { equals: t.name } } })
+  for (const t of genresToCreate) {
+    const existing = await payload.find({ collection: 'genres', where: { name: { equals: t.name } } })
     if (existing.totalDocs > 0) {
-      tagIds.push(existing.docs[0].id)
+      genreIds.push(existing.docs[0].id)
     } else {
-      tagIds.push((await payload.create({ collection: 'tags', data: t })).id)
+      genreIds.push((await payload.create({ collection: 'genres', data: t })).id)
     }
   }
 
@@ -100,7 +100,7 @@ async function seed() {
     const numTags = 2 + (validItemsCount % 2)
     const itemTags = []
     for (let j = 0; j < numTags; j++) {
-      itemTags.push(tagIds[(validItemsCount + j * 2) % tagIds.length])
+      itemTags.push(genreIds[(validItemsCount + j * 2) % genreIds.length])
     }
 
     try {
@@ -113,7 +113,7 @@ async function seed() {
           duration: '04:15',
           author: authorId,
           views: `${Math.floor(Math.random() * 900) + 10}K`,
-          tags: itemTags,
+          genres: itemTags,
         } as any,
       })
       itemIds.push(item.id)

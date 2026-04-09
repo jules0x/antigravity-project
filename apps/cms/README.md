@@ -1,6 +1,6 @@
-# Antigravity CMS
+# Flux CMS
 
-This is the backend Content Management System for the Antigravity project, powered by [Payload CMS 3.0](https://payloadcms.com/). It runs on Next.js App Router and utilizes SQLite for the database.
+This is the backend Content Management System for the Flux project, powered by [Payload CMS 3.0](https://payloadcms.com/). It runs on Next.js App Router and utilizes SQLite for the database.
 
 ## Overview
 
@@ -25,7 +25,7 @@ To spin up the entire stack locally, follow these steps:
 4. Open `http://localhost:3000/admin` in your browser to access the CMS admin panel.
 
 ## Features
-- Content management configured for the Antigravity frontend.
+- Content management configured for the Flux frontend.
 - Supports Draft Previews across published and draft collections.
 - **SEO Management:** Configurable SEO metadata (titles, descriptions, images) for Pages and Items.
 - **Redirects:** Dedicated collection to handle 301/302 HTTP redirects.

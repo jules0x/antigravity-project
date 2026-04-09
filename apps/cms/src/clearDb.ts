@@ -8,7 +8,7 @@ async function clear() {
   
   await payload.delete({ collection: 'pages', where: { id: { exists: true } } })
   await payload.delete({ collection: 'items', where: { id: { exists: true } } })
-  await payload.delete({ collection: 'tags', where: { id: { exists: true } } })
+  await payload.delete({ collection: 'genres', where: { id: { exists: true } } })
   await payload.delete({ collection: 'authors', where: { id: { exists: true } } })
 
   console.log('Cleared!')

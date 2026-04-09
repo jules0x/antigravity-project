@@ -18,6 +18,7 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
+    "@ducanh2912/next-pwa": "^10.2.9",
     "@payloadcms/db-sqlite": "3.79.1",
     "@payloadcms/next": "3.79.1",
     "@payloadcms/plugin-import-export": "3.79.1",

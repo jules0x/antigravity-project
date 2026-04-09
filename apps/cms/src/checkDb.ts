@@ -4,8 +4,8 @@ import config from './payload.config'
 
 async function check() {
   const payload = await getPayload({ config })
-  const tags = await payload.find({ collection: 'tags' })
-  console.log(`Tags: ${tags.totalDocs}`)
+  const genres = await payload.find({ collection: 'genres' })
+  console.log(`Genres: ${genres.totalDocs}`)
   const items = await payload.find({ collection: 'items' })
   console.log(`Items: ${items.totalDocs}`)
   const authors = await payload.find({ collection: 'authors' })
